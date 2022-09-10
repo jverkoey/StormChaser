@@ -309,9 +309,9 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
     }
     return playlistIdToDepth[playlist1.playlistPersistentID]! < playlistIdToDepth[playlist2.playlistPersistentID]!
   }) {
-    //  guard let items = playlist.playlistItems, items.contains(where: { trackIdFilter.contains($0.trackID) }) else {
-    //    continue
-    //  }
+    guard let items = playlist.playlistItems?.filter { trackFilter(library.tracks[$0.trackID]!) }, !items.isEmpty else {
+      continue
+    }
     output += "\n\t\t<dict>"
 
     output += "\n\t\t\t<key>Name</key><string>\(CFXMLCreateStringByEscapingEntities(nil, playlist.name as NSString, nil)! as String)</string>"
@@ -336,22 +336,17 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
       output += "\n\t\t\t<key>Folder</key><true/>"
     }
 
-    if let items = playlist.playlistItems {
-      output += "\n\t\t\t<key>Playlist Items</key>"
-      output += "\n\t\t\t<array>"
-      for item in items {
-        guard trackFilter(library.tracks[item.trackID]!) else {
-          continue
-        }
-        //      guard trackIdFilter.contains(item.trackID) else {
-        //        continue
-        //      }
-        output += "\n\t\t\t\t<dict>"
-        output += "\n\t\t\t\t\t<key>Track ID</key><integer>\(item.trackID)</integer>"
-        output += "\n\t\t\t\t</dict>"
-      }
-      output += "\n\t\t\t</array>"
+    output += "\n\t\t\t<key>Playlist Items</key>"
+    output += "\n\t\t\t<array>"
+    for item in items {
+      //      guard trackIdFilter.contains(item.trackID) else {
+      //        continue
+      //      }
+      output += "\n\t\t\t\t<dict>"
+      output += "\n\t\t\t\t\t<key>Track ID</key><integer>\(item.trackID)</integer>"
+      output += "\n\t\t\t\t</dict>"
     }
+    output += "\n\t\t\t</array>"
     output += "\n\t\t</dict>"
   }
 
