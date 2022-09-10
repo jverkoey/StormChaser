@@ -43,12 +43,14 @@ struct MediaItem: Hashable, Identifiable {
   let id: Int64
   let title: String
   let artist: String
+  let rating: Int64
+  let ratingComputed: Bool
 }
 
 struct PlaylistView: SwiftUI.View {
   private let playlist: Playlist
   private let mediaItems: [MediaItem]
-  @State private var selection: Int64?
+  @State private var selection: MediaItem?
 
   fileprivate init(playlist: Playlist, db: Connection) {
     self.playlist = playlist
@@ -63,7 +65,9 @@ struct PlaylistView: SwiftUI.View {
           .select(
             MediaItemTable.id,
             MediaItemTable.title,
-            MediaItemTable.artistId
+            MediaItemTable.artistId,
+            MediaItemTable.rating,
+            MediaItemTable.ratingComputed
           )
           .where( playlistOrder.contains(MediaItemTable.id) )
       ).reduce(into: [:], { partialResult, row in
@@ -84,7 +88,9 @@ struct PlaylistView: SwiftUI.View {
         partialResult[row[MediaItemTable.id]] = MediaItem(
           id: row[MediaItemTable.id],
           title: row[MediaItemTable.title],
-          artist: artistName ?? ""
+          artist: artistName ?? "",
+          rating: row[MediaItemTable.rating],
+          ratingComputed: row[MediaItemTable.ratingComputed]
         )
       })
 
@@ -95,9 +101,18 @@ struct PlaylistView: SwiftUI.View {
   }
 
   var body: some SwiftUI.View {
-    Table(mediaItems, selection: $selection) {
-      TableColumn("Title", value: \.title)
-      TableColumn("Artist", value: \.artist)
+    List(mediaItems, id: \.self, selection: $selection) { item in
+      HStack {
+        Text(String(item.rating))
+          .frame(minWidth: 50)
+          .multilineTextAlignment(.leading)
+        if item.ratingComputed {
+          Text("Computed rating")
+        }
+        Text(item.title)
+        Spacer()
+        Text(item.artist)
+      }
     }
   }
 }
@@ -162,7 +177,6 @@ struct StormChaserApp: App {
         List(playlists, id: \.self, children: \.children, selection: $selection) { playlist in
           Text(playlist.name)
         }
-        .listStyle(.sidebar)
         VStack {
           HStack {
             Button {
