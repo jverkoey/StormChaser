@@ -13,7 +13,18 @@ func getDocumentsDirectory() -> URL {
 private let documentsUrl = getDocumentsDirectory()
 private let dbUrl = documentsUrl.appendingPathComponent("hurricane.sqlite3")
 private let db = try Connection(dbUrl.absoluteString)
+//private let dbArtwork = try Connection(documentsUrl.appendingPathComponent("hurricane-artwork.sqlite3").absoluteString)
 
+
+// Migrate all artwork to another db
+//try ArtworkTable.createTable(db: dbArtwork)
+//for item in try db.prepare(MediaItemTable.table
+//  .select(MediaItemTable.id,
+//          MediaItemTable.artwork
+//         ).where(MediaItemTable.artwork != nil)
+//) {
+//  try ArtworkTable.insert(db: dbArtwork, id: item[MediaItemTable.id], artwork: item[MediaItemTable.artwork]!)
+//}
 //try migrateItunesToDatabase(db: db)
 
 //for item in try db.prepare(MediaItemTable.table

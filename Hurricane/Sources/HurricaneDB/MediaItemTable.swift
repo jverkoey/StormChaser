@@ -65,7 +65,6 @@ public final class MediaItemTable {
   public static let locationType = Expression<Int64>("locationType")
   public static let mediaKind = Expression<Int64>("mediaKind")
   public static let lyricsContentRating = Expression<Int64>("lyricsContentRating")
-  public static let artwork = Expression<Data?>("artwork")
   public static let artworkFormat = Expression<Int64?>("artworkFormat")
 
   enum LocationType: Int64 {
@@ -160,7 +159,6 @@ public final class MediaItemTable {
       t.column(userDisabled)
       t.column(lastPlayedDate)
       t.column(lyricsContentRating)
-      t.column(artwork)
       t.column(artworkFormat)
     })
   }
@@ -180,6 +178,7 @@ public final class MediaItemTable {
 
       let imageDataFormat: Int64?
       if let artwork = item.artwork {
+        // TODO: Write the artwork out to the artwork database.
         imageDataFormat = Int64(artwork.imageDataFormat.rawValue)
       } else {
         imageDataFormat = nil
@@ -229,7 +228,6 @@ public final class MediaItemTable {
         userDisabled <- item.isUserDisabled,
         lastPlayedDate <- item.lastPlayedDate,
         lyricsContentRating <- Int64(item.lyricsContentRating.rawValue),
-        artwork <- item.artwork?.imageData,
         artworkFormat <- imageDataFormat,
         onConflictOf: id
       )
