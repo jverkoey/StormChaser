@@ -16,7 +16,20 @@ private let db = try Connection(dbUrl.absoluteString)
 
 //try migrateItunesToDatabase(db: db)
 
-let library = try buildInMemoryRepresentation(db: db)
+//for item in try db.prepare(MediaItemTable.table
+//  .select(MediaItemTable.id,
+//          MediaItemTable.location
+//         ).where(!MediaItemTable.ratingComputed && MediaItemTable.rating == 40)
+//) {
+//  var location = item[MediaItemTable.location]!
+//  location = location.replacingOccurrences(of: "/Volumes/CHOCOBO/", with: "/Users/featherless/Dropbox/Chocobo-2star/")
+//  location = location.replacingOccurrences(of: "/Volumes/Chocobo/", with: "/Users/featherless/Dropbox/Chocobo-2star/")
+//  if FileManager.default.fileExists(atPath: URL(string: location)!.path) {
+//    let itemToUpdate = MediaItemTable.table.filter(MediaItemTable.id == item[MediaItemTable.id])
+//    try db.run(itemToUpdate.update(MediaItemTable.location <- location))
+//  }
+//}
+//let library = try buildInMemoryRepresentation(db: db)
 
 // Move 1/2-star tracks over to Dropbox
 //let fm = FileManager.default
