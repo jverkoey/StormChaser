@@ -1,7 +1,7 @@
 import Foundation
 
 public struct ITunesLibrary {
-  public init(majorVersion: Int, minorVersion: Int, date: Date, applicationVersion: String, features: Int, showContentRatings: Bool, musicFolder: String, libraryPersistentID: String, tracks: [Int : ITunesTrack], playlists: [ITunesPlaylist]) {
+  public init(majorVersion: Int, minorVersion: Int, date: Date, applicationVersion: String, features: Int, showContentRatings: Bool, musicFolder: String, libraryPersistentID: String, tracks: [Int : ITunesTrack], playlists: [ITunesPlaylist], playlistPersistentIdsWithChildren: Set<String>) {
     self.majorVersion = majorVersion
     self.minorVersion = minorVersion
     self.date = date
@@ -12,6 +12,7 @@ public struct ITunesLibrary {
     self.libraryPersistentID = libraryPersistentID
     self.tracks = tracks
     self.playlists = playlists
+    self.playlistPersistentIdsWithChildren = playlistPersistentIdsWithChildren
   }
 
   public let majorVersion: Int
@@ -22,6 +23,7 @@ public struct ITunesLibrary {
   public let showContentRatings: Bool
   public let musicFolder: String
   public let libraryPersistentID: String
+  public let playlistPersistentIdsWithChildren: Set<String>
 
   public let tracks: [Int: ITunesTrack]
   public let playlists: [ITunesPlaylist]
