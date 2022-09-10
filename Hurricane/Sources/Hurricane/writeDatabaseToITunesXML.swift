@@ -3,7 +3,7 @@ import SQLite
 import HurricaneDB
 import iTunesXML
 
-func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless/Documents/Library.xml") throws {
+func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless/Documents/Library.xml", trackFilter: (ITunesTrack) -> Bool) throws {
   var nextId: Int = 1
 
   var tracks: [Int: ITunesTrack] = [:]
@@ -12,6 +12,8 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
 
   var albums: [Int64: (discNumber: Int?, rating: Int?, ratingComputed: Bool)] = [:]
 
+  print("Building in-memory representation of the itunes library...")
+  print("- Fetching all tracks...")
   for item in try db.prepare(MediaItemTable.table
     .select(MediaItemTable.id,
             MediaItemTable.title,
@@ -22,6 +24,8 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
             MediaItemTable.totalTime,
             MediaItemTable.albumId,
             MediaItemTable.trackNumber,
+            MediaItemTable.rating,
+            MediaItemTable.ratingComputed,
             MediaItemTable.year,
             MediaItemTable.beatsPerMinute,
             MediaItemTable.modifiedDate,
@@ -94,7 +98,9 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
       trackType: item[MediaItemTable.kind] ?? "",
       location: item[MediaItemTable.location] ?? "",
       fileFolderCount: -1,
-      libraryFolderCount: -1
+      libraryFolderCount: -1,
+      rating: Int(item[MediaItemTable.rating]),
+      ratingComputed: item[MediaItemTable.ratingComputed]
     )
 
     nextId += 1
@@ -103,6 +109,7 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
   var playlistPersistentIdToId: [Int64: Int] = [:]
   var playlistPersistentIdsWithChildren = Set<String>()
 
+  print("- Fetching all playlists...")
   var playlists: [ITunesPlaylist] = []
   for item in try db.prepare(PlaylistsTable.table
     .select(PlaylistsTable.id,
@@ -151,6 +158,7 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
     nextId += 1
   }
 
+  print("- Creating iTunes library object...")
   let library = ITunesLibrary(
     majorVersion: 1,
     minorVersion: 1,
@@ -168,6 +176,7 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
 //  trackFilter.insert("1ED794A8A3EF5C92")
 //  var trackIdFilter = Set<Int>()
 
+  print("Writing XML...")
   let dateFormatter = DateFormatter()
   dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
   var output = """
@@ -187,12 +196,12 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
   \t<dict>
   """
 
+  print("Writing tracks...")
   for id in library.tracks.keys.sorted() {
     let track = library.tracks[id]!
-    //  guard trackFilter.contains(track.persistentID) else {
-    //    continue
-    //  }
-    //  trackIdFilter.insert(id)
+    if !trackFilter(track) {
+      continue
+    }
 
     output += """
 
@@ -240,6 +249,12 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
     if let value = track.comments {
       output += "\n\t\t\t<key>Comments</key><string>\(CFXMLCreateStringByEscapingEntities(nil, value as NSString, nil)! as String)</string>"
     }
+    if track.rating > 0 {
+      output += "\n\t\t\t<key>Rating</key><integer>\(track.rating)</integer>"
+    }
+    if track.ratingComputed {
+      output += "\n\t\t\t<key>Rating Computed</key><integer>\(track.ratingComputed)</integer>"
+    }
     if let value = track.albumRating {
       output += "\n\t\t\t<key>Album Rating</key><integer>\(value)</integer>"
     }
@@ -264,6 +279,7 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
   \t<array>
   """
 
+  print("Writing playlists...")
   // Build a tree of all playlists so that we can sort them in breadth-first order
   // First, build a lookup table so that we can determine the depth of each playlist
   var playlistIdToPlaylist: [String: ITunesPlaylist] = [:]
@@ -324,6 +340,9 @@ func writeDatabaseToITunesXML(db: Connection, path: String = "/Users/featherless
       output += "\n\t\t\t<key>Playlist Items</key>"
       output += "\n\t\t\t<array>"
       for item in items {
+        guard trackFilter(library.tracks[item.trackID]!) else {
+          continue
+        }
         //      guard trackIdFilter.contains(item.trackID) else {
         //        continue
         //      }

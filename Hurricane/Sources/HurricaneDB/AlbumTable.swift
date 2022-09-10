@@ -1,5 +1,5 @@
 import Foundation
-#if canImport(ITunesLibrary)
+#if canImport(iTunesLibrary)
 import iTunesLibrary
 #endif
 import SQLite
@@ -40,7 +40,7 @@ public final class AlbumTable {
     })
   }
 
-#if canImport(ITunesLibrary)
+#if canImport(iTunesLibrary)
   static func update(db: Connection, album: ITLibAlbum) throws {
     if seenIds.contains(album.persistentID.int64Value) {
       return

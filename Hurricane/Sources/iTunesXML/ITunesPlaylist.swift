@@ -1,6 +1,6 @@
 import Foundation
 
-public struct ITunesPlaylist: Codable {
+public struct ITunesPlaylist {
   public init(name: String, description: String, master: Bool? = nil, playlistID: Int, playlistPersistentID: String, parentPersistentID: String? = nil, visible: Bool? = nil, allItems: Bool, folder: Bool? = nil, playlistItems: [ITunesPlaylistItem]? = nil) {
     self.name = name
     self.description = description
@@ -24,17 +24,4 @@ public struct ITunesPlaylist: Codable {
   public let allItems: Bool
   public let folder: Bool?
   public let playlistItems: [ITunesPlaylistItem]?
-
-  enum CodingKeys: String, CodingKey {
-    case name = "Name"
-    case description = "Description"
-    case master = "Master"
-    case playlistID = "Playlist ID"
-    case playlistPersistentID = "Playlist Persistent ID"
-    case parentPersistentID = "Parent Persistent ID"
-    case visible = "Visible"
-    case allItems = "All Items"
-    case folder = "Folder"
-    case playlistItems = "Playlist Items"
-  }
 }

@@ -9,9 +9,25 @@ func getDocumentsDirectory() -> URL {
   let documentsDirectory = paths[0]
   return documentsDirectory
 }
+//
+//let itunes = try ITLibrary(apiVersion: "1.0")
+//for track in itunes.allMediaItems {
+//  if let rating = track.value(forProperty: ITLibMediaItemPropertyRating) as? Int,
+//     let albumRating = track.value(forProperty: ITLibMediaItemPropertyAlbumRating) as? Int,
+//     albumRating != rating {
+//    print("Title: ", track.title)
+//    let albumRating = track.value(forProperty: ITLibMediaItemPropertyAlbumRating)
+//    print("Album rating: ", albumRating)
+//    print("Rating: ", rating, track.rating)
+//  }
+//}
 
 private let documentsUrl = getDocumentsDirectory()
-private let dbUrl = documentsUrl.appending(path: "hurricane.sqlite3")
+private let dbUrl = documentsUrl.appendingPathComponent("hurricane.sqlite3")
 private let db = try Connection(dbUrl.absoluteString)
 
-try writeDatabaseToITunesXML(db: db)
+//try migrateItunesToDatabase(db: db)
+
+try writeDatabaseToITunesXML(db: db) { track in
+  return !track.ratingComputed && track.rating >= 60
+}

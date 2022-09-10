@@ -1,7 +1,7 @@
 import Foundation
 
-public struct ITunesTrack: Codable {
-  public init(trackID: Int, name: String, artist: String? = nil, composer: String? = nil, kind: String, size: Int? = nil, totalTime: Int? = nil, discNumber: Int? = nil, trackNumber: Int? = nil, year: Int? = nil, bpm: Int? = nil, dateModified: Date? = nil, dateAdded: Date, bitRate: Int? = nil, sampleRate: Int? = nil, comments: String? = nil, albumRating: Int? = nil, albumRatingComputed: Bool? = nil, normalization: Int? = nil, persistentID: String, trackType: String, location: String, fileFolderCount: Int? = nil, libraryFolderCount: Int? = nil) {
+public struct ITunesTrack {
+  public init(trackID: Int, name: String, artist: String? = nil, composer: String? = nil, kind: String, size: Int? = nil, totalTime: Int? = nil, discNumber: Int? = nil, trackNumber: Int? = nil, year: Int? = nil, bpm: Int? = nil, dateModified: Date? = nil, dateAdded: Date, bitRate: Int? = nil, sampleRate: Int? = nil, comments: String? = nil, albumRating: Int? = nil, albumRatingComputed: Bool? = nil, normalization: Int? = nil, persistentID: String, trackType: String, location: String, fileFolderCount: Int? = nil, libraryFolderCount: Int? = nil, rating: Int, ratingComputed: Bool) {
     self.trackID = trackID
     self.name = name
     self.artist = artist
@@ -26,6 +26,8 @@ public struct ITunesTrack: Codable {
     self.location = location
     self.fileFolderCount = fileFolderCount
     self.libraryFolderCount = libraryFolderCount
+    self.rating = rating
+    self.ratingComputed = ratingComputed
   }
 
   public let trackID: Int
@@ -52,33 +54,6 @@ public struct ITunesTrack: Codable {
   public let location: String
   public let fileFolderCount: Int?
   public let libraryFolderCount: Int?
-
-
-
-  enum CodingKeys: String, CodingKey {
-    case trackID = "Track ID"
-    case name = "Name"
-    case artist = "Artist"
-    case composer = "Composer"
-    case kind = "Kind"
-    case size = "Size"
-    case totalTime = "Total Time"
-    case discNumber = "Disc Number"
-    case trackNumber = "Track Number"
-    case year = "Year"
-    case bpm = "BPM"
-    case dateModified = "Date Modified"
-    case dateAdded = "Date Added"
-    case bitRate = "Bit Rate"
-    case sampleRate = "Sample Rate"
-    case comments = "Comments"
-    case albumRating = "Album Rating"
-    case albumRatingComputed = "Album Rating Computed"
-    case normalization = "Normalization"
-    case persistentID = "Persistent ID"
-    case trackType = "Track Type"
-    case location = "Location"
-    case fileFolderCount = "File Folder Count"
-    case libraryFolderCount = "Library Folder Count"
-  }
+  public let rating: Int
+  public let ratingComputed: Bool
 }

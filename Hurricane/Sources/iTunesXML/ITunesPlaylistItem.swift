@@ -1,13 +1,9 @@
 import Foundation
 
-public struct ITunesPlaylistItem: Codable {
+public struct ITunesPlaylistItem {
   public init(trackID: Int) {
     self.trackID = trackID
   }
 
   public let trackID: Int
-
-  enum CodingKeys: String, CodingKey {
-    case trackID = "Track ID"
-  }
 }

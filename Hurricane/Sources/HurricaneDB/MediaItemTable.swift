@@ -1,11 +1,11 @@
 import Foundation
-#if canImport(ITunesLibrary)
+#if canImport(iTunesLibrary)
 import iTunesLibrary
 #endif
 import SQLite
 
-#if canImport(ITunesLibrary)
-func migrateItunesToDatabase(db: Connection) throws {
+#if canImport(iTunesLibrary)
+public func migrateItunesToDatabase(db: Connection) throws {
   let itunes = try ITLibrary(apiVersion: "1.0")
 
   try PlaylistsTable.createTable(db: db)
@@ -30,6 +30,8 @@ public final class MediaItemTable {
   public static let sortComposer = Expression<String?>("sortComposer")
   public static let rating = Expression<Int64>("rating")
   public static let ratingComputed = Expression<Bool>("ratingComputed")
+  public static let albumRating = Expression<Int64?>("albumRating")
+  public static let albumRatingComputed = Expression<Bool?>("albumRatingComputed")
   public static let genre = Expression<String>("genre")
   public static let kind = Expression<String?>("kind")
   public static let fileSize = Expression<Int64>("fileSize")
@@ -126,6 +128,8 @@ public final class MediaItemTable {
       t.column(sortComposer)
       t.column(rating)
       t.column(ratingComputed)
+      t.column(albumRating)
+      t.column(albumRatingComputed)
       t.column(genre)
       t.column(kind)
       t.column(fileSize)
@@ -161,7 +165,7 @@ public final class MediaItemTable {
     })
   }
 
-#if canImport(ITunesLibrary)
+#if canImport(iTunesLibrary)
   static func populateAll(db: Connection, itunes: ITLibrary) throws {
     let artistTable = ArtistTable.self
     let albumTable = AlbumTable.self
@@ -193,6 +197,8 @@ public final class MediaItemTable {
         sortComposer <- item.sortComposer,
         rating <- Int64(item.rating),
         ratingComputed <- item.isRatingComputed,
+        albumRating <- item.value(forProperty: ITLibMediaItemPropertyAlbumRating) as? Int64,
+        albumRatingComputed <- item.value(forProperty: ITLibMediaItemPropertyAlbumRatingComputed) as? Bool,
         genre <- item.genre,
         kind <- item.kind,
         fileSize <- Int64(item.fileSize),
