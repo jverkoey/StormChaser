@@ -44,6 +44,7 @@ struct MediaItem: Hashable, Identifiable {
   let id: Int64
   let title: String
   let artist: String
+  let grouping: String
   let rating: Int64
   let ratingComputed: Bool
   let url: URL
@@ -71,6 +72,7 @@ struct PlaylistView: SwiftUI.View {
             MediaItemTable.id,
             MediaItemTable.title,
             MediaItemTable.artistId,
+            MediaItemTable.grouping,
             MediaItemTable.rating,
             MediaItemTable.ratingComputed,
             MediaItemTable.location
@@ -98,6 +100,7 @@ struct PlaylistView: SwiftUI.View {
           id: row[MediaItemTable.id],
           title: row[MediaItemTable.title],
           artist: artistName ?? "",
+          grouping: row[MediaItemTable.grouping] ?? "",
           rating: row[MediaItemTable.rating],
           ratingComputed: row[MediaItemTable.ratingComputed],
           url: URL(string: location)!
@@ -122,6 +125,8 @@ struct PlaylistView: SwiftUI.View {
         Text(item.title)
         Spacer()
         Text(item.artist)
+        Spacer()
+        Text(item.grouping)
       }.contextMenu {
         Button("Reveal in Finder") {
           NSWorkspace.shared.selectFile(item.url.path, inFileViewerRootedAtPath: item.url.deletingLastPathComponent().path)
