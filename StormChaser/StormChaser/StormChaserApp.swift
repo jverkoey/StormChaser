@@ -122,6 +122,10 @@ struct PlaylistView: SwiftUI.View {
         Text(item.title)
         Spacer()
         Text(item.artist)
+      }.contextMenu {
+        Button("Reveal in Finder") {
+          NSWorkspace.shared.selectFile(item.url.path, inFileViewerRootedAtPath: item.url.deletingLastPathComponent().path)
+        }
       }
     }
   }
