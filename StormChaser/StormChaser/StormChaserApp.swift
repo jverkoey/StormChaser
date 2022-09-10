@@ -42,6 +42,7 @@ private final class Playlist: Equatable, Identifiable, Hashable {
 struct MediaItem: Hashable, Identifiable {
   let id: Int64
   let title: String
+  let artist: String
 }
 
 struct PlaylistView: SwiftUI.View {
@@ -55,14 +56,35 @@ struct PlaylistView: SwiftUI.View {
     if !playlist.items.isEmpty {
       let playlistOrder = playlist.items.components(separatedBy: ",").map { Int64(bitPattern: UInt64($0, radix: 16)!) }
 
+      var artistNames: [Int64: String] = [:]
+
       let itemMap: [Int64: MediaItem] = try! db.prepare(
         MediaItemTable.table
-          .select(MediaItemTable.id, MediaItemTable.title)
+          .select(
+            MediaItemTable.id,
+            MediaItemTable.title,
+            MediaItemTable.artistId
+          )
           .where( playlistOrder.contains(MediaItemTable.id) )
       ).reduce(into: [:], { partialResult, row in
+        let artistName: String?
+        if let artistId = row[MediaItemTable.artistId] {
+          if let name = artistNames[artistId] {
+            artistName = name
+          } else if let artist = try db.pluck(ArtistTable.table.select(ArtistTable.name).where(ArtistTable.id == artistId)) {
+            artistName = artist[ArtistTable.name]
+            artistNames[artistId] = artistName
+          } else {
+            artistName = nil
+          }
+        } else {
+          artistName = nil
+        }
+
         partialResult[row[MediaItemTable.id]] = MediaItem(
           id: row[MediaItemTable.id],
-          title: row[MediaItemTable.title]
+          title: row[MediaItemTable.title],
+          artist: artistName ?? ""
         )
       })
 
@@ -75,6 +97,7 @@ struct PlaylistView: SwiftUI.View {
   var body: some SwiftUI.View {
     Table(mediaItems, selection: $selection) {
       TableColumn("Title", value: \.title)
+      TableColumn("Artist", value: \.artist)
     }
   }
 }
@@ -85,7 +108,9 @@ struct StormChaserApp: App {
   private let db: Connection
   private let playlists: [Playlist]
 
+  @State private var playingItem: MediaItem?
   @State private var selection: Playlist?
+  @State private var volume: Double = 1.0
 
   init() {
     self.db = try! Connection(documentsUrl.appendingPathComponent("hurricane.sqlite3").absoluteString)
@@ -138,10 +163,27 @@ struct StormChaserApp: App {
           Text(playlist.name)
         }
         .listStyle(.sidebar)
-        if let selection = self.selection {
-          PlaylistView(playlist: selection, db: db)
-        } else {
-          Text("Pick a playlist")
+        VStack {
+          HStack {
+            Button {
+              print("Play button pressed")
+            } label: {
+              Image(systemName: "play.fill")
+            }
+            .disabled(playingItem == nil)
+            if let playingItem = playingItem {
+              Text(playingItem.title)
+            } else {
+              Text("No track playing")
+            }
+            Slider(value: $volume)
+              .frame(maxWidth: 150)
+          }
+          if let selection = self.selection {
+            PlaylistView(playlist: selection, db: db)
+          } else {
+            Text("Pick a playlist")
+          }
         }
       }
     }
