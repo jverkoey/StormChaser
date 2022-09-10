@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(ITunesLibrary)
 import iTunesLibrary
+#endif
 import SQLite
 
 public final class ArtistTable {
@@ -19,6 +21,7 @@ public final class ArtistTable {
     })
   }
 
+#if canImport(ITunesLibrary)
   static func update(db: Connection, artist: ITLibArtist) throws {
     if seenIds.contains(artist.persistentID.int64Value) {
       return
@@ -31,4 +34,5 @@ public final class ArtistTable {
     )
     try db.run(insert)
   }
+#endif
 }

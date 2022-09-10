@@ -13,6 +13,9 @@ let package = Package(
     .executable(
       name: "Hurricane",
       targets: ["Hurricane"]),
+    .library(
+      name: "HurricaneDB",
+      targets: ["HurricaneDB"]),
   ],
   dependencies: [
     .package(url: "https://github.com/stephencelis/SQLite.swift.git", from: "0.13.3")

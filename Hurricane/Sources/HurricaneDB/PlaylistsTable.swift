@@ -1,5 +1,7 @@
 import Foundation
+#if canImport(ITunesLibrary)
 import iTunesLibrary
+#endif
 import SQLite
 
 public final class PlaylistsTable {
@@ -32,6 +34,7 @@ public final class PlaylistsTable {
     })
   }
 
+#if canImport(ITunesLibrary)
   static func populateAll(db: Connection, itunes: ITLibrary) throws {
     for playlist in itunes.allPlaylists {
       let itemIds = playlist.items.map { "\(String($0.persistentID.uint64Value, radix: 16, uppercase: true))" }.joined(separator: ",")
@@ -46,4 +49,5 @@ public final class PlaylistsTable {
       try db.run(insert)
     }
   }
+#endif
 }

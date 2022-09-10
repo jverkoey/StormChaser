@@ -1,7 +1,10 @@
 import Foundation
+#if canImport(ITunesLibrary)
 import iTunesLibrary
+#endif
 import SQLite
 
+#if canImport(ITunesLibrary)
 func migrateItunesToDatabase(db: Connection) throws {
   let itunes = try ITLibrary(apiVersion: "1.0")
 
@@ -13,6 +16,7 @@ func migrateItunesToDatabase(db: Connection) throws {
   try MediaItemTable.createTable(db: db)
   try MediaItemTable.populateAll(db: db, itunes: itunes)
 }
+#endif
 
 public final class MediaItemTable {
   public static let table = Table("mediaitems")
@@ -157,6 +161,7 @@ public final class MediaItemTable {
     })
   }
 
+#if canImport(ITunesLibrary)
   static func populateAll(db: Connection, itunes: ITLibrary) throws {
     let artistTable = ArtistTable.self
     let albumTable = AlbumTable.self
@@ -225,6 +230,7 @@ public final class MediaItemTable {
       try db.run(insert)
     }
   }
+#endif
 }
 
 /*
