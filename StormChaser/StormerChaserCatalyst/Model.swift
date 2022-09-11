@@ -11,14 +11,14 @@ import SQLite
 
 final class Playlist: Equatable, Identifiable, Hashable {
   internal init(id: Int64, parentId: Int64?, name: String, items: String, children: [Playlist]? = nil) {
-    self.identifier = id
+    self.id = id
     self.parentId = parentId
     self.name = name
     self.items = items
     self.children = children
   }
 
-  let identifier: Int64
+  let id: Int64
   let parentId: Int64?
   let name: String
   let items: String
@@ -31,7 +31,7 @@ final class Playlist: Equatable, Identifiable, Hashable {
   }
 
   func hash(into hasher: inout Hasher) {
-    hasher.combine(identifier)
+    hasher.combine(id)
   }
 }
 
@@ -42,13 +42,23 @@ final class Model {
   var url: URL? {
     didSet {
       if let url = url {
-        let db = try! Connection(url.path)
+        let db = try! Connection(url.appendingPathComponent("hurricane.sqlite3").path)
         self.db = db
         playlists = Model.buildPlaylists(db: db)
       } else {
         db = nil
         playlists = []
       }
+    }
+  }
+
+  func movePlaylist(_ playlist: Playlist, into destinationPlaylist: Playlist) {
+    let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)
+
+    if url!.startAccessingSecurityScopedResource() {
+      try! db!.run(selector.update(PlaylistsTable.parentId <- destinationPlaylist.id))
+      playlists = Model.buildPlaylists(db: db!)
+      url!.stopAccessingSecurityScopedResource()
     }
   }
 

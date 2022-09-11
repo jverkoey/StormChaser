@@ -13,7 +13,7 @@ extension UserDefaults {
   static let modelKey = "com.stormchaser.prefs.model"
 }
 
-final class SidebarViewController: UIViewController {
+final class SidebarViewController: UIViewController, UICollectionViewDelegate {
   let model: Model
   init(model: Model) {
     self.model = model
@@ -28,6 +28,7 @@ final class SidebarViewController: UIViewController {
   var collectionView: UICollectionView!
   typealias DiffableDataSource = UICollectionViewDiffableDataSource<String, Playlist>
   var dataSource: DiffableDataSource!
+  private var expandedNodes = Set<Int64>()
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -36,6 +37,9 @@ final class SidebarViewController: UIViewController {
     let layout = UICollectionViewCompositionalLayout.list(using: config)
     collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
     collectionView.translatesAutoresizingMaskIntoConstraints = false
+    collectionView.dragInteractionEnabled = true
+    collectionView.dragDelegate = self
+    collectionView.dropDelegate = self
     view.addSubview(collectionView)
 
     NSLayoutConstraint.activate([
@@ -44,6 +48,9 @@ final class SidebarViewController: UIViewController {
       collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
     ])
+
+    let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongGesture(gesture:)))
+    collectionView.addGestureRecognizer(longPressGesture)
 
     let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Playlist> { (cell, indexPath, playlist) in
       var content = cell.defaultContentConfiguration()
@@ -57,10 +64,33 @@ final class SidebarViewController: UIViewController {
       return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: node)
     }
 
+    dataSource.sectionSnapshotHandlers.willCollapseItem = { [weak self] playlist in
+      self?.expandedNodes.remove(playlist.id)
+    }
+    dataSource.sectionSnapshotHandlers.willExpandItem = { [weak self] playlist in
+      self?.expandedNodes.insert(playlist.id)
+    }
+
     collectionView.dataSource = dataSource
 
     if model.url != nil {
       applySnapshot(animated: false)
+    }
+  }
+
+  @objc func handleLongGesture(gesture: UILongPressGestureRecognizer) {
+    switch(gesture.state) {
+    case .began:
+      guard let selectedIndexPath = collectionView.indexPathForItem(at: gesture.location(in: collectionView)) else {
+        break
+      }
+      collectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
+    case .changed:
+      collectionView.updateInteractiveMovementTargetPosition(gesture.location(in: gesture.view))
+    case .ended:
+      collectionView.endInteractiveMovement()
+    default:
+      collectionView.cancelInteractiveMovement()
     }
   }
 
@@ -76,7 +106,7 @@ final class SidebarViewController: UIViewController {
     super.viewDidAppear(animated)
 
     if model.url == nil {
-      let supportedTypes: [UTType] = [UTType(filenameExtension: "sqlite3")!]
+      let supportedTypes: [UTType] = [.folder]
       let picker = UIDocumentPickerViewController(forOpeningContentTypes: supportedTypes)
       picker.delegate = self
       present(picker, animated: true)
@@ -84,26 +114,26 @@ final class SidebarViewController: UIViewController {
   }
 
   func applySnapshot(animated: Bool) {
-    var sectionSnapshot = NSDiffableDataSourceSectionSnapshot<Playlist>()
-    sectionSnapshot.append(model.playlists)
-    for playlist in model.playlists {
-      addChildren(of: playlist, to: &sectionSnapshot)
+    var nodesToExpand = Set<Playlist>()
+    var snapshot = NSDiffableDataSourceSectionSnapshot<Playlist>()
+
+    func addItems(_ playlists: [Playlist], to parent: Playlist?) {
+      snapshot.append(playlists, to: parent)
+      for playlist in playlists where playlist.children != nil {
+        if expandedNodes.contains(playlist.id) {
+          // I'll check here if the new one is an expanded one
+          // and I should mark it as "to expand" on the next snapshot
+          nodesToExpand.insert(playlist)
+        }
+        addItems(playlist.children!, to: playlist)
+      }
     }
+    addItems(model.playlists, to: nil)
+    snapshot.expand(Array(nodesToExpand))
 
-//    sectionSnapshot.expand(sectionSnapshot.items)
-
-    dataSource.apply(sectionSnapshot, to: "", animatingDifferences: animated)
+    dataSource.apply(snapshot, to: "", animatingDifferences: animated)
   }
 
-  func addChildren(of node: Playlist, to sectionSnapshot: inout NSDiffableDataSourceSectionSnapshot<Playlist>) {
-    guard let children = node.children else { return }
-
-    sectionSnapshot.append(children, to: node)
-
-    for child in children {
-      addChildren(of: child, to: &sectionSnapshot)
-    }
-  }
 }
 
 extension SidebarViewController: UIDocumentPickerDelegate {
@@ -127,5 +157,62 @@ extension SidebarViewController: UIDocumentPickerDelegate {
     model.url = url
 
     applySnapshot(animated: false)
+  }
+}
+
+extension SidebarViewController: UICollectionViewDragDelegate {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    itemsForBeginning session: UIDragSession,
+    at indexPath: IndexPath
+  ) -> [UIDragItem] {
+    let playlist = dataSource.itemIdentifier(for: indexPath)!
+    let item = NSItemProvider(object: PlaylistItem(playlist: playlist.id))
+    let dragItem = UIDragItem(itemProvider: item)
+    return [dragItem]
+  }
+}
+
+extension SidebarViewController: UICollectionViewDropDelegate {
+  func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+    guard collectionView.hasActiveDrag else {
+      return UICollectionViewDropProposal(operation: .cancel)
+    }
+    guard session.items.count == 1 else {
+      fatalError("Unhandled")
+      // We don't allow dropping multiple items.
+      //      return UICollectionViewDropProposal(operation: .cancel)
+    }
+    return UICollectionViewDropProposal(operation: .move, intent: .insertIntoDestinationIndexPath)
+  }
+
+  func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+    let item = coordinator.items[0]
+    let sourcePlaylist = dataSource.itemIdentifier(for: item.sourceIndexPath!)!
+    let destinationPlaylist = dataSource.itemIdentifier(for: coordinator.destinationIndexPath!)!
+
+    model.movePlaylist(sourcePlaylist, into: destinationPlaylist)
+
+    applySnapshot(animated: true)
+  }
+}
+
+final class PlaylistItem: NSObject, NSItemProviderWriting, NSItemProviderReading {
+  let playlist: Int64
+  init(playlist: Int64) {
+    self.playlist = playlist
+  }
+
+  static var readableTypeIdentifiersForItemProvider: [String] = [UTType.commaSeparatedText.identifier]
+
+  static func object(withItemProviderData data: Data, typeIdentifier: String) throws -> PlaylistItem {
+    return PlaylistItem(playlist: Int64(String(data: data, encoding: .ascii)!)!)
+  }
+
+  static var writableTypeIdentifiersForItemProvider: [String] = [UTType.commaSeparatedText.identifier]
+
+  func loadData(withTypeIdentifier typeIdentifier: String, forItemProviderCompletionHandler completionHandler: @escaping (Data?, Error?) -> Void) -> Progress? {
+    completionHandler("\(playlist)".data(using: .ascii), nil)
+    return nil
   }
 }

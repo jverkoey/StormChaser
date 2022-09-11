@@ -4,15 +4,7 @@ import iTunesXML
 import HurricaneDB
 import SQLite
 
-func getDocumentsDirectory() -> URL {
-  let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-  let documentsDirectory = paths[0]
-  return documentsDirectory
-}
-
-private let documentsUrl = getDocumentsDirectory()
-private let dbUrl = documentsUrl.appendingPathComponent("hurricane.sqlite3")
-private let db = try Connection(dbUrl.absoluteString)
+private let db = try Connection("/Users/featherless/Documents/chocobo.hurricane/hurricane.sqlite3")
 //private let dbArtwork = try Connection(documentsUrl.appendingPathComponent("hurricane-artwork.sqlite3").absoluteString)
 
 
@@ -40,8 +32,8 @@ private let db = try Connection(dbUrl.absoluteString)
 //    try db.run(itemToUpdate.update(MediaItemTable.location <- location))
 //  }
 //}
-//let library = try buildInMemoryRepresentation(db: db)
 
+//let library = try buildInMemoryRepresentation(db: db)
 // Move 1/2-star tracks over to Dropbox
 //let fm = FileManager.default
 //for (_, track) in library.tracks.filter { !$0.value.ratingComputed && $0.value.rating == 20 } {
@@ -64,7 +56,8 @@ private let db = try Connection(dbUrl.absoluteString)
 //  }
 //}
 
-//try writeDatabaseToITunesXML(db: db) { track in
-//  return !track.ratingComputed && track.rating >= 60
-//}
+let library = try buildInMemoryRepresentation(db: db)
+try writeDatabaseToITunesXML(library: library, path: "/Users/featherless/Documents/Library.xml") { track in
+  return !track.ratingComputed && track.rating >= 60
+}
 
