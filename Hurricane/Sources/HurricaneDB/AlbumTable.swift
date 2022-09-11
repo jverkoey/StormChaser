@@ -40,7 +40,7 @@ public final class AlbumTable {
     })
   }
 
-#if canImport(iTunesLibrary)
+#if canImport(iTunesLibrary) && !targetEnvironment(macCatalyst)
   static func update(db: Connection, album: ITLibAlbum) throws {
     if seenIds.contains(album.persistentID.int64Value) {
       return

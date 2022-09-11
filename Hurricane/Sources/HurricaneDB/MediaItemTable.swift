@@ -4,7 +4,7 @@ import iTunesLibrary
 #endif
 import SQLite
 
-#if canImport(iTunesLibrary)
+#if canImport(iTunesLibrary) && !targetEnvironment(macCatalyst)
 public func migrateItunesToDatabase(db: Connection) throws {
   let itunes = try ITLibrary(apiVersion: "1.0")
 
@@ -163,7 +163,7 @@ public final class MediaItemTable {
     })
   }
 
-#if canImport(iTunesLibrary)
+#if canImport(iTunesLibrary) && !targetEnvironment(macCatalyst)
   static func populateAll(db: Connection, itunes: ITLibrary) throws {
     let artistTable = ArtistTable.self
     let albumTable = AlbumTable.self

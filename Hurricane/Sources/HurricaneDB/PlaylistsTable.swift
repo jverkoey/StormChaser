@@ -34,7 +34,7 @@ public final class PlaylistsTable {
     })
   }
 
-#if canImport(iTunesLibrary)
+#if canImport(iTunesLibrary) && !targetEnvironment(macCatalyst)
   static func populateAll(db: Connection, itunes: ITLibrary) throws {
     for playlist in itunes.allPlaylists {
       let itemIds = playlist.items.map { "\(String($0.persistentID.uint64Value, radix: 16, uppercase: true))" }.joined(separator: ",")

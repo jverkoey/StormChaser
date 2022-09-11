@@ -21,7 +21,7 @@ public final class ArtistTable {
     })
   }
 
-#if canImport(iTunesLibrary)
+#if canImport(iTunesLibrary) && !targetEnvironment(macCatalyst)
   static func update(db: Connection, artist: ITLibArtist) throws {
     if seenIds.contains(artist.persistentID.int64Value) {
       return
