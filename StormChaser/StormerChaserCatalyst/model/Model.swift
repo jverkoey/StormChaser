@@ -9,32 +9,6 @@ import Foundation
 import HurricaneDB
 import SQLite
 
-final class Playlist: Equatable, Identifiable, Hashable {
-  internal init(id: Int64, parentId: Int64?, name: String, items: String, children: [Playlist]? = nil) {
-    self.id = id
-    self.parentId = parentId
-    self.name = name
-    self.items = items
-    self.children = children
-  }
-
-  let id: Int64
-  let parentId: Int64?
-  let name: String
-  let items: String
-  var children: [Playlist]? = nil
-
-  var isFolder: Bool { children != nil }
-
-  static func == (lhs: Playlist, rhs: Playlist) -> Bool {
-    lhs === rhs
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
-}
-
 final class Model {
   private var db: Connection?
   var playlists: [Playlist] = []
@@ -51,6 +25,60 @@ final class Model {
       }
     }
   }
+
+  func items(in playlist: Playlist) -> [MediaItem] {
+    guard let db = db else {
+      return []
+    }
+
+    let playlistOrder: [Int64] = playlist.items.components(separatedBy: ",").map { Int64(bitPattern: UInt64($0, radix: 16)!) }
+
+    var artistNames: [Int64: String] = [:]
+
+    let itemMap: [Int64: MediaItem] = try! db.prepare(
+      MediaItemTable.table
+        .select(
+          MediaItemTable.id,
+          MediaItemTable.title,
+          MediaItemTable.artistId,
+          MediaItemTable.grouping,
+          MediaItemTable.rating,
+          MediaItemTable.ratingComputed,
+          MediaItemTable.location
+        )
+        .where( playlistOrder.contains(MediaItemTable.id) )
+    ).reduce(into: [:], { partialResult, row in
+      guard let location = row[MediaItemTable.location] else {
+        return
+      }
+      let artistName: String?
+      if let artistId = row[MediaItemTable.artistId] {
+        if let name = artistNames[artistId] {
+          artistName = name
+        } else if let artist = try db.pluck(ArtistTable.table.select(ArtistTable.name).where(ArtistTable.id == artistId)) {
+          artistName = artist[ArtistTable.name]
+          artistNames[artistId] = artistName
+        } else {
+          artistName = nil
+        }
+      } else {
+        artistName = nil
+      }
+
+      partialResult[row[MediaItemTable.id]] = MediaItem(
+        id: row[MediaItemTable.id],
+        title: row[MediaItemTable.title],
+        grouping: row[MediaItemTable.grouping]
+      )
+    })
+
+    return playlistOrder.map { itemMap[$0]! }
+  }
+}
+
+// MARK: - Playlists
+
+extension Model {
 
   func movePlaylist(_ playlist: Playlist, into destinationPlaylist: Playlist) {
     let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)

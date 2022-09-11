@@ -13,7 +13,13 @@ extension UserDefaults {
   static let modelKey = "com.stormchaser.prefs.model"
 }
 
-final class SidebarViewController: UIViewController, UICollectionViewDelegate {
+protocol SidebarViewControllerDelegate: AnyObject {
+  func sidebarViewController(_ sidebarViewController: SidebarViewController, didSelectPlaylist playlist: Playlist)
+}
+
+final class SidebarViewController: UIViewController {
+  weak var delegate: SidebarViewControllerDelegate?
+
   let model: Model
   init(model: Model) {
     self.model = model
@@ -37,6 +43,7 @@ final class SidebarViewController: UIViewController, UICollectionViewDelegate {
     let layout = UICollectionViewCompositionalLayout.list(using: config)
     collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
     collectionView.translatesAutoresizingMaskIntoConstraints = false
+    collectionView.delegate = self
     collectionView.dragInteractionEnabled = true
     collectionView.dragDelegate = self
     collectionView.dropDelegate = self
@@ -133,7 +140,6 @@ final class SidebarViewController: UIViewController, UICollectionViewDelegate {
 
     dataSource.apply(snapshot, to: "", animatingDifferences: animated)
   }
-
 }
 
 extension SidebarViewController: UIDocumentPickerDelegate {
@@ -157,6 +163,13 @@ extension SidebarViewController: UIDocumentPickerDelegate {
     model.url = url
 
     applySnapshot(animated: false)
+  }
+}
+
+extension SidebarViewController: UICollectionViewDelegate {
+  func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    let playlist = dataSource.itemIdentifier(for: indexPath)!
+    delegate?.sidebarViewController(self, didSelectPlaylist: playlist)
   }
 }
 
