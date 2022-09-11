@@ -117,16 +117,18 @@ struct PlaylistView: SwiftUI.View {
     List(mediaItems, id: \.self, selection: $selectedItem) { item in
       HStack {
         Text(String(item.rating))
-          .frame(minWidth: 50)
-          .multilineTextAlignment(.leading)
+          .frame(minWidth: 50, alignment: .leading)
         if item.ratingComputed {
           Text("Computed rating")
         }
         Text(item.title)
+          .frame(maxWidth: 500, alignment: .leading)
         Spacer()
         Text(item.artist)
+          .frame(maxWidth: 200, alignment: .leading)
         Spacer()
         Text(item.grouping)
+          .frame(maxWidth: 200, alignment: .leading)
       }.contextMenu {
         Button("Reveal in Finder") {
           NSWorkspace.shared.selectFile(item.url.path, inFileViewerRootedAtPath: item.url.deletingLastPathComponent().path)
@@ -221,6 +223,7 @@ struct StormChaserApp: App {
         List(playlists, id: \.self, children: \.children, selection: $selection) { playlist in
           Text(playlist.name)
         }
+        .frame(minWidth: 200)
         VStack {
           HStack {
             Button {
