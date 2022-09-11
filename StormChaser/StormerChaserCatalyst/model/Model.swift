@@ -31,7 +31,13 @@ final class Model {
       return []
     }
 
-    let playlistOrder: [Int64] = playlist.items.components(separatedBy: ",").map { Int64(bitPattern: UInt64($0, radix: 16)!) }
+    let playlistOrder: [Int64]
+
+    if !playlist.items.isEmpty {
+      playlistOrder = playlist.items.components(separatedBy: ",").map { Int64(bitPattern: UInt64($0, radix: 16)!) }
+    } else {
+      playlistOrder = []
+    }
 
     var artistNames: [Int64: String] = [:]
 

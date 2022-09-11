@@ -11,6 +11,7 @@ import UIKit
 
 extension UserDefaults {
   static let modelKey = "com.stormchaser.prefs.model"
+  static let expandedPlaylists = "com.stormchaser.prefs.expanded_playlists"
 }
 
 protocol SidebarViewControllerDelegate: AnyObject {
@@ -71,11 +72,16 @@ final class SidebarViewController: UIViewController {
       return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: node)
     }
 
+    if let storedExpansion = UserDefaults.standard.object(forKey: UserDefaults.expandedPlaylists) as? [Int64] {
+      expandedNodes = Set(storedExpansion)
+    }
     dataSource.sectionSnapshotHandlers.willCollapseItem = { [weak self] playlist in
       self?.expandedNodes.remove(playlist.id)
+      self?.saveExpansionState()
     }
     dataSource.sectionSnapshotHandlers.willExpandItem = { [weak self] playlist in
       self?.expandedNodes.insert(playlist.id)
+      self?.saveExpansionState()
     }
 
     collectionView.dataSource = dataSource
@@ -83,6 +89,10 @@ final class SidebarViewController: UIViewController {
     if model.url != nil {
       applySnapshot(animated: false)
     }
+  }
+
+  func saveExpansionState() {
+    UserDefaults.standard.set(Array(expandedNodes), forKey: UserDefaults.expandedPlaylists)
   }
 
   @objc func handleLongGesture(gesture: UILongPressGestureRecognizer) {
