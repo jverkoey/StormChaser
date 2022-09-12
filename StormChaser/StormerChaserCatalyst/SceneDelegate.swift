@@ -11,14 +11,10 @@ import UIKit
 
 
 extension NSToolbarItem {
-  @objc func setTrackTitle(_ string: String) {
-    fatalError("Unhandled")
-  }
-  @objc func set(currentTime: TimeInterval, duration: TimeInterval) {
-    fatalError("Unhandled")
-  }
+  @objc func setTrackTitle(_ string: String) { fatalError("Unhandled") }
+  @objc func set(currentTime: TimeInterval, duration: TimeInterval) { fatalError("Unhandled") }
+  @objc func set(mediaUrl url: URL?) { fatalError("Unhandled") }
 }
-
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -153,6 +149,7 @@ extension SceneDelegate: SidebarViewControllerDelegate {
 extension SceneDelegate: PlaylistViewControllerDelegate {
   private func updatePlayer(with mediaItem: MediaItem) {
     playerFieldItem?.setTrackTitle(mediaItem.title)
+    playerFieldItem?.set(mediaUrl: mediaItem.url)
   }
 
   private func updatePlaybackState() {

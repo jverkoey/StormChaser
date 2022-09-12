@@ -21,62 +21,78 @@ final class PlayerView: NSView {
   let titleLabel = createLabel()
   let currentTimeLabel = createLabel()
   let durationLabel = createLabel()
+  let waveformImageView = NSImageView()
+  let progressLayoutConstraint: NSLayoutConstraint
 
   override init(frame frameRect: NSRect) {
+    let progressViewBackground = NSView()
+    progressViewBackground.translatesAutoresizingMaskIntoConstraints = false
+    progressViewBackground.wantsLayer = true
+    progressViewBackground.layer?.backgroundColor = NSColor(white: 0.4, alpha: 1).cgColor
+
+    progressLayoutConstraint = progressViewBackground.widthAnchor.constraint(equalToConstant: 0)
+
     super.init(frame: frameRect)
 
     wantsLayer = true
     layer?.backgroundColor = NSColor(white: 0.3, alpha: 1).cgColor
     layer?.cornerRadius = 2
 
+    waveformImageView.translatesAutoresizingMaskIntoConstraints = false
+    waveformImageView.wantsLayer = true
+    waveformImageView.layer?.compositingFilter = "differenceBlendMode"
+    print(waveformImageView.layer)
+
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.stringValue = ""
     titleLabel.alignment = .center
     titleLabel.textColor = .init(white: 0.95, alpha: 1)
     titleLabel.font = NSFont.systemFont(ofSize: 10)
-    addSubview(titleLabel)
 
     currentTimeLabel.translatesAutoresizingMaskIntoConstraints = false
     currentTimeLabel.stringValue = ""
     currentTimeLabel.alignment = .left
-    currentTimeLabel.textColor = .init(white: 0.6, alpha: 1)
+    currentTimeLabel.textColor = .init(white: 0.7, alpha: 1)
     currentTimeLabel.font = NSFont.systemFont(ofSize: 10)
-    addSubview(currentTimeLabel)
 
     durationLabel.translatesAutoresizingMaskIntoConstraints = false
     durationLabel.stringValue = ""
     durationLabel.alignment = .left
-    durationLabel.textColor = .init(white: 0.6, alpha: 1)
+    durationLabel.textColor = .init(white: 0.7, alpha: 1)
     durationLabel.font = NSFont.systemFont(ofSize: 10)
     durationLabel.isHidden = true
-    addSubview(durationLabel)
 
-    let progressViewBackground = NSView()
-    progressViewBackground.translatesAutoresizingMaskIntoConstraints = false
-    progressViewBackground.wantsLayer = true
-    progressViewBackground.layer?.backgroundColor = NSColor(white: 0.4, alpha: 1).cgColor
     addSubview(progressViewBackground)
+    addSubview(waveformImageView)
+    addSubview(titleLabel)
+    addSubview(currentTimeLabel)
+    addSubview(durationLabel)
 
     let padding: CGFloat = 6
     NSLayoutConstraint.activate([
       widthAnchor.constraint(equalToConstant: 600),
       heightAnchor.constraint(equalToConstant: 44),
 
+      progressViewBackground.leadingAnchor.constraint(equalTo: leadingAnchor),
+      progressViewBackground.topAnchor.constraint(equalTo: topAnchor),
+      progressViewBackground.bottomAnchor.constraint(equalTo: bottomAnchor),
+      progressLayoutConstraint,
+
       titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: padding),
       titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
       titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
-      titleLabel.bottomAnchor.constraint(equalTo: progressViewBackground.bottomAnchor, constant: -padding),
+      titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding),
+
+      waveformImageView.topAnchor.constraint(equalTo: topAnchor),
+      waveformImageView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      waveformImageView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      waveformImageView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
       currentTimeLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
-      currentTimeLabel.bottomAnchor.constraint(equalTo: progressViewBackground.topAnchor, constant: -8),
+      currentTimeLabel.topAnchor.constraint(equalTo: topAnchor, constant: 8),
 
       durationLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
-      durationLabel.bottomAnchor.constraint(equalTo: progressViewBackground.topAnchor, constant: -8),
-
-      progressViewBackground.heightAnchor.constraint(equalToConstant: 3),
-      progressViewBackground.leadingAnchor.constraint(equalTo: leadingAnchor),
-      progressViewBackground.trailingAnchor.constraint(equalTo: trailingAnchor),
-      progressViewBackground.bottomAnchor.constraint(equalTo: bottomAnchor),
+      durationLabel.topAnchor.constraint(equalTo: topAnchor, constant: 8),
     ])
   }
 
@@ -87,6 +103,7 @@ final class PlayerView: NSView {
 
 final class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
   let playerView = PlayerView(frame: NSRect.zero)
+  var loadedUrl: URL?
 
   override init(itemIdentifier: NSToolbarItem.Identifier) {
     super.init(itemIdentifier: itemIdentifier)
@@ -115,12 +132,38 @@ final class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
 
     if duration.isNaN {
       playerView.durationLabel.isHidden = true
+      playerView.progressLayoutConstraint.constant = 0
     } else {
       playerView.durationLabel.isHidden = false
       playerView.durationLabel.attributedStringValue = NSAttributedString(string: Utility.formatSecondsToHMS(duration), attributes: [
         .font: NSFont.systemFont(ofSize: 10),
         .paragraphStyle: paragraphStyle
       ])
+
+      let progress = currentTime / duration
+      playerView.progressLayoutConstraint.constant = 600 * progress
+    }
+  }
+
+  @objc func set(mediaUrl url: URL?) {
+    self.playerView.waveformImageView.isHidden = true
+    loadedUrl = url
+    if let url = url {
+      let waveformImageDrawer = WaveformImageDrawer()
+      let config = Waveform.Configuration(
+        size: CGSize(width: 600, height: 40),
+        style: .filled(NSColor.init(white: 0.45, alpha: 1)),
+        position: .top
+      )
+      waveformImageDrawer.waveformImage(fromAudioAt: url, with: config) { image in
+        DispatchQueue.main.async {
+          guard self.loadedUrl == url else {
+            return
+          }
+          self.playerView.waveformImageView.image = image
+          self.playerView.waveformImageView.isHidden = false
+        }
+      }
     }
   }
 }
