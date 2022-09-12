@@ -9,11 +9,16 @@ import AVKit
 import UniformTypeIdentifiers
 import UIKit
 
+@objc protocol PlayerViewDelegate: AnyObject {
+  func playerView(_ playerView: AnyObject, didScrubToPosition position: Double)
+  func playerView(_ playerView: AnyObject, didStopScrubbingAtPosition position: Double)
+}
 
 extension NSToolbarItem {
   @objc func setTrackTitle(_ string: String) { fatalError("Unhandled") }
   @objc func set(currentTime: TimeInterval, duration: TimeInterval) { fatalError("Unhandled") }
   @objc func set(mediaUrl url: URL?) { fatalError("Unhandled") }
+  @objc func setDelegate(_ delegate: PlayerViewDelegate?) { fatalError("Unhandled") }
 }
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -95,6 +100,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         if let statusItemClass = NSClassFromString("StormchaserBridge.PlayerFieldItem") as? NSToolbarItem.Type {
           playerFieldItem = statusItemClass.init(itemIdentifier: .player)
+          playerFieldItem?.setDelegate(self)
         }
       }
       catch {
@@ -207,5 +213,17 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
 
   func playlistViewControllerIsMediaPlaying(_ playlistViewController: PlaylistViewController) -> Bool {
     return audioPlayer.timeControlStatus == .playing
+  }
+}
+
+extension SceneDelegate: PlayerViewDelegate {
+  func playerView(_ playerView: AnyObject, didScrubToPosition position: Double) {
+    var duration = audioPlayer.currentItem!.duration.seconds
+    let targetTime = CMTime(seconds: position * duration, preferredTimescale: 600)
+    audioPlayer.seek(to: targetTime)
+  }
+
+  func playerView(_ playerView: AnyObject, didStopScrubbingAtPosition position: Double) {
+//    audioPlayer.play()
   }
 }

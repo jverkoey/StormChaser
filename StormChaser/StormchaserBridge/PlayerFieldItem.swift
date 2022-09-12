@@ -7,6 +7,11 @@
 
 import AppKit
 
+@objc protocol PlayerViewDelegate: AnyObject {
+  func playerView(_ playerView: AnyObject, didScrubToPosition position: Double)
+  func playerView(_ playerView: AnyObject, didStopScrubbingAtPosition position: Double)
+}
+
 private func createLabel() -> NSTextField {
   let textField = NSTextField()
   textField.maximumNumberOfLines = 1
@@ -18,6 +23,8 @@ private func createLabel() -> NSTextField {
 }
 
 final class PlayerView: NSView {
+  weak var delegate: PlayerViewDelegate?
+
   let titleLabel = createLabel()
   let currentTimeLabel = createLabel()
   let durationLabel = createLabel()
@@ -41,7 +48,6 @@ final class PlayerView: NSView {
     waveformImageView.translatesAutoresizingMaskIntoConstraints = false
     waveformImageView.wantsLayer = true
     waveformImageView.layer?.compositingFilter = "differenceBlendMode"
-    print(waveformImageView.layer)
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.stringValue = ""
@@ -96,6 +102,27 @@ final class PlayerView: NSView {
     ])
   }
 
+  override func mouseDown(with event: NSEvent) {
+    super.mouseDown(with: event)
+
+    let position = convert(event.locationInWindow, from: nil)
+    delegate?.playerView(self, didScrubToPosition: max(0, min(1, position.x / bounds.width)))
+  }
+
+  override func mouseDragged(with event: NSEvent) {
+    super.mouseDragged(with: event)
+
+    let position = convert(event.locationInWindow, from: nil)
+    delegate?.playerView(self, didScrubToPosition: max(0, min(1, position.x / bounds.width)))
+  }
+
+  override func mouseUp(with event: NSEvent) {
+    super.mouseUp(with: event)
+
+    let position = convert(event.locationInWindow, from: nil)
+    delegate?.playerView(self, didStopScrubbingAtPosition: max(0, min(1, position.x / bounds.width)))
+  }
+
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -111,6 +138,10 @@ final class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
     self.view = playerView
 
     visibilityPriority = .high
+  }
+
+  @objc func setDelegate(_ delegate: PlayerViewDelegate?) {
+    playerView.delegate = delegate
   }
 
   @objc func setTrackTitle(_ string: String) {
