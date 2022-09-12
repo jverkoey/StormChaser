@@ -8,6 +8,14 @@
 import UniformTypeIdentifiers
 import UIKit
 
+
+extension NSToolbarItem {
+  @objc func setTrackTitle(_ string: String) {
+
+  }
+}
+
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   var window: UIWindow?
@@ -127,6 +135,6 @@ extension SceneDelegate: SidebarViewControllerDelegate {
 
 extension SceneDelegate: PlaylistViewControllerDelegate {
   func playlistViewController(_ playlistViewController: PlaylistViewController, playMediaItem mediaItem: MediaItem) {
-    print(mediaItem.title)
+    playerFieldItem?.setTrackTitle(mediaItem.title)
   }
 }
