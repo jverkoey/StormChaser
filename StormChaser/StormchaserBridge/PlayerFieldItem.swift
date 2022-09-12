@@ -182,7 +182,7 @@ final class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
     if let url = url {
       let waveformImageDrawer = WaveformImageDrawer()
       let config = Waveform.Configuration(
-        size: CGSize(width: 600, height: 40),
+        size: playerView.bounds.size,
         style: .filled(NSColor.init(white: 0.45, alpha: 1)),
         position: .top
       )
