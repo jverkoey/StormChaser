@@ -5,6 +5,7 @@
 //  Created by Jeff Verkoeyen on 9/10/22.
 //
 
+import AVKit
 import UniformTypeIdentifiers
 import UIKit
 
@@ -22,6 +23,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   var sidebar: SidebarViewController!
   var playlistController: PlaylistViewController!
+
+  let audioPlayer = AVPlayer()
 
 #if targetEnvironment(macCatalyst)
   var playerFieldItem: NSToolbarItem?
@@ -136,5 +139,13 @@ extension SceneDelegate: SidebarViewControllerDelegate {
 extension SceneDelegate: PlaylistViewControllerDelegate {
   func playlistViewController(_ playlistViewController: PlaylistViewController, playMediaItem mediaItem: MediaItem) {
     playerFieldItem?.setTrackTitle(mediaItem.title)
+
+    audioPlayer.pause()
+
+    if let url = mediaItem.url {
+      let playerItem = AVPlayerItem(url: url)
+      audioPlayer.replaceCurrentItem(with: playerItem)
+      audioPlayer.play()
+    }
   }
 }

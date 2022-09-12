@@ -54,9 +54,6 @@ final class Model {
         )
         .where( playlistOrder.contains(MediaItemTable.id) )
     ).reduce(into: [:], { partialResult, row in
-      guard let location = row[MediaItemTable.location] else {
-        return
-      }
       let artistName: String?
       if let artistId = row[MediaItemTable.artistId] {
         if let name = artistNames[artistId] {
@@ -71,10 +68,17 @@ final class Model {
         artistName = nil
       }
 
+      let url: URL?
+      if let location = row[MediaItemTable.location] {
+        url = URL(string: location)!
+      } else {
+        url = nil
+      }
       partialResult[row[MediaItemTable.id]] = MediaItem(
         id: row[MediaItemTable.id],
         title: row[MediaItemTable.title],
-        grouping: row[MediaItemTable.grouping]
+        grouping: row[MediaItemTable.grouping],
+        url: url
       )
     })
 
