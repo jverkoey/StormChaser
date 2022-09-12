@@ -7,16 +7,15 @@
 
 import AppKit
 
-class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
+final class PlayerView: NSView {
   let titleLabel = NSTextField()
 
-  override init(itemIdentifier: NSToolbarItem.Identifier) {
-    super.init(itemIdentifier: itemIdentifier)
+  override init(frame frameRect: NSRect) {
+    super.init(frame: frameRect)
 
-    let view = NSView()
-    view.wantsLayer = true
-    view.layer?.backgroundColor = NSColor.darkGray.cgColor
-    view.layer?.cornerRadius = 2
+    wantsLayer = true
+    layer?.backgroundColor = NSColor.darkGray.cgColor
+    layer?.cornerRadius = 2
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.stringValue = ""
@@ -28,19 +27,32 @@ class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
     titleLabel.isBezeled = false
     titleLabel.isEditable = false
     titleLabel.font = NSFont.systemFont(ofSize: 10)
-    view.addSubview(titleLabel)
+    addSubview(titleLabel)
 
     let padding: CGFloat = 6
     NSLayoutConstraint.activate([
-      view.widthAnchor.constraint(equalToConstant: 600),
-      view.heightAnchor.constraint(equalToConstant: 44),
+      widthAnchor.constraint(equalToConstant: 600),
+      heightAnchor.constraint(equalToConstant: 44),
 
-      titleLabel.topAnchor.constraint(equalTo: view.topAnchor, constant: padding),
-      titleLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
-      titleLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
-      titleLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -padding),
+      titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: padding),
+      titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
+      titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
+      titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding),
     ])
-    self.view = view
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+}
+
+final class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
+  let playerView = PlayerView(frame: NSRect.zero)
+
+  override init(itemIdentifier: NSToolbarItem.Identifier) {
+    super.init(itemIdentifier: itemIdentifier)
+
+    self.view = playerView
 
     visibilityPriority = .high
   }
@@ -48,7 +60,7 @@ class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
   @objc func setTrackTitle(_ string: String) {
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.alignment = .center
-    titleLabel.attributedStringValue = NSAttributedString(string: string, attributes: [
+    playerView.titleLabel.attributedStringValue = NSAttributedString(string: string, attributes: [
       .font: NSFont.systemFont(ofSize: 12),
       .paragraphStyle: paragraphStyle
     ])

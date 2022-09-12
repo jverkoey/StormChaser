@@ -30,6 +30,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 #if targetEnvironment(macCatalyst)
   var playerFieldItem: NSToolbarItem?
 #endif
+  let playPauseItem = NSToolbarItem(itemIdentifier: NSToolbarItem.Identifier.play)
 
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -105,12 +106,12 @@ extension SceneDelegate: NSToolbarDelegate {
     if itemIdentifier == NSToolbarItem.Identifier.player {
       return playerFieldItem
     }
-    let item = NSToolbarItem(itemIdentifier: itemIdentifier)
-    if itemIdentifier == NSToolbarItem.Identifier.play {
-      item.image = UIImage(systemName: "play.fill")
-      item.action = NSSelectorFromString("togglePlaybackOfSelectedItem:")
+    if itemIdentifier == playPauseItem.itemIdentifier {
+      playPauseItem.image = UIImage(systemName: "play.fill")
+      playPauseItem.action = NSSelectorFromString("togglePlaybackOfSelectedItem:")
+      return playPauseItem
     }
-    return item
+    return nil
   }
 
   func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
@@ -142,6 +143,14 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
     playerFieldItem?.setTrackTitle(mediaItem.title)
   }
 
+  private func updatePlaybackState() {
+    print(audioPlayer.timeControlStatus.rawValue)
+    playPauseItem.image = (audioPlayer.timeControlStatus == .playing
+                           || audioPlayer.timeControlStatus == .waitingToPlayAtSpecifiedRate)
+    ? UIImage(systemName: "pause.fill")
+    : UIImage(systemName: "play.fill")
+  }
+
   private func loadAndPlay(mediaItem: MediaItem) {
     updatePlayer(with: mediaItem)
 
@@ -155,6 +164,7 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
       audioPlayer.replaceCurrentItem(with: playerItem)
       audioPlayer.play()
     }
+    updatePlaybackState()
   }
 
   func playlistViewController(_ playlistViewController: PlaylistViewController, togglePlaybackOfMediaItem mediaItem: MediaItem) {
@@ -167,6 +177,7 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
     } else {
       audioPlayer.play()
     }
+    updatePlaybackState()
   }
 
   func playlistViewController(_ playlistViewController: PlaylistViewController, playMediaItem mediaItem: MediaItem) {
@@ -178,6 +189,7 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
       if audioPlayer.timeControlStatus != .playing {
         audioPlayer.play()
       }
+      updatePlaybackState()
       return
     }
 
