@@ -7,27 +7,47 @@
 
 import AppKit
 
+private func createLabel() -> NSTextField {
+  let textField = NSTextField()
+  textField.maximumNumberOfLines = 1
+  textField.cell?.truncatesLastVisibleLine = true
+  textField.backgroundColor = nil
+  textField.isBezeled = false
+  textField.isEditable = false
+  return textField
+}
+
 final class PlayerView: NSView {
-  let titleLabel = NSTextField()
+  let titleLabel = createLabel()
+  let durationLabel = createLabel()
 
   override init(frame frameRect: NSRect) {
     super.init(frame: frameRect)
 
     wantsLayer = true
-    layer?.backgroundColor = NSColor.darkGray.cgColor
+    layer?.backgroundColor = NSColor(white: 0.3, alpha: 1).cgColor
     layer?.cornerRadius = 2
 
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.stringValue = ""
     titleLabel.alignment = .center
-    titleLabel.maximumNumberOfLines = 1
-    titleLabel.cell?.truncatesLastVisibleLine = true
-    titleLabel.backgroundColor = nil
     titleLabel.textColor = .init(white: 0.95, alpha: 1)
-    titleLabel.isBezeled = false
-    titleLabel.isEditable = false
     titleLabel.font = NSFont.systemFont(ofSize: 10)
     addSubview(titleLabel)
+
+    durationLabel.translatesAutoresizingMaskIntoConstraints = false
+    durationLabel.stringValue = ""
+    durationLabel.alignment = .left
+    durationLabel.textColor = .init(white: 0.6, alpha: 1)
+    durationLabel.font = NSFont.systemFont(ofSize: 10)
+    durationLabel.isHidden = true
+    addSubview(durationLabel)
+
+    let progressViewBackground = NSView()
+    progressViewBackground.translatesAutoresizingMaskIntoConstraints = false
+    progressViewBackground.wantsLayer = true
+    progressViewBackground.layer?.backgroundColor = NSColor(white: 0.4, alpha: 1).cgColor
+    addSubview(progressViewBackground)
 
     let padding: CGFloat = 6
     NSLayoutConstraint.activate([
@@ -37,7 +57,15 @@ final class PlayerView: NSView {
       titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: padding),
       titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
       titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
-      titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding),
+      titleLabel.bottomAnchor.constraint(equalTo: progressViewBackground.bottomAnchor, constant: -padding),
+
+      durationLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
+      durationLabel.bottomAnchor.constraint(equalTo: progressViewBackground.topAnchor, constant: -8),
+
+      progressViewBackground.heightAnchor.constraint(equalToConstant: 3),
+      progressViewBackground.leadingAnchor.constraint(equalTo: leadingAnchor),
+      progressViewBackground.trailingAnchor.constraint(equalTo: trailingAnchor),
+      progressViewBackground.bottomAnchor.constraint(equalTo: bottomAnchor),
     ])
   }
 
@@ -64,5 +92,35 @@ final class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
       .font: NSFont.systemFont(ofSize: 12),
       .paragraphStyle: paragraphStyle
     ])
+  }
+
+  @objc func set(currentTime: TimeInterval, duration: TimeInterval) {
+    if duration.isNaN {
+      playerView.durationLabel.isHidden = true
+    } else {
+      playerView.durationLabel.isHidden = false
+      let paragraphStyle = NSMutableParagraphStyle()
+      paragraphStyle.alignment = .left
+      playerView.durationLabel.attributedStringValue = NSAttributedString(string: Utility.formatSecondsToHMS(duration), attributes: [
+        .font: NSFont.systemFont(ofSize: 10),
+        .paragraphStyle: paragraphStyle
+      ])
+    }
+  }
+}
+
+private enum Utility {
+  static func formatSecondsToHMS(_ seconds: TimeInterval) -> String {
+    let secondsInt:Int = Int(seconds.rounded(.towardZero))
+
+    let dh: Int = (secondsInt/3600)
+    let dm: Int = (secondsInt - (dh*3600))/60
+    let ds: Int = secondsInt - (dh*3600) - (dm*60)
+
+    let hs = "\(dh > 0 ? "\(dh):" : "")"
+    let ms = "\(dm<10 ? "0" : "")\(dm):"
+    let s = "\(ds<10 ? "0" : "")\(ds)"
+
+    return hs + ms + s
   }
 }

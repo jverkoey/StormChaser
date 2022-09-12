@@ -12,7 +12,10 @@ import UIKit
 
 extension NSToolbarItem {
   @objc func setTrackTitle(_ string: String) {
-
+    fatalError("Unhandled")
+  }
+  @objc func set(currentTime: TimeInterval, duration: TimeInterval) {
+    fatalError("Unhandled")
   }
 }
 
@@ -34,6 +37,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
+
+    let interval = CMTime(seconds: 0.1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+    audioPlayer.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
+      guard let strongSelf = self else {
+        return
+      }
+      var duration = strongSelf.audioPlayer.currentItem!.duration.seconds
+      strongSelf.playerFieldItem?.set(currentTime: time.seconds, duration: duration)
+    }
 
     let model = Model()
     if let modelBookmark = UserDefaults.standard.data(forKey: UserDefaults.modelKey) {
