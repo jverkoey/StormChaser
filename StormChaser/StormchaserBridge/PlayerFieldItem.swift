@@ -19,6 +19,7 @@ private func createLabel() -> NSTextField {
 
 final class PlayerView: NSView {
   let titleLabel = createLabel()
+  let currentTimeLabel = createLabel()
   let durationLabel = createLabel()
 
   override init(frame frameRect: NSRect) {
@@ -34,6 +35,13 @@ final class PlayerView: NSView {
     titleLabel.textColor = .init(white: 0.95, alpha: 1)
     titleLabel.font = NSFont.systemFont(ofSize: 10)
     addSubview(titleLabel)
+
+    currentTimeLabel.translatesAutoresizingMaskIntoConstraints = false
+    currentTimeLabel.stringValue = ""
+    currentTimeLabel.alignment = .left
+    currentTimeLabel.textColor = .init(white: 0.6, alpha: 1)
+    currentTimeLabel.font = NSFont.systemFont(ofSize: 10)
+    addSubview(currentTimeLabel)
 
     durationLabel.translatesAutoresizingMaskIntoConstraints = false
     durationLabel.stringValue = ""
@@ -58,6 +66,9 @@ final class PlayerView: NSView {
       titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
       titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
       titleLabel.bottomAnchor.constraint(equalTo: progressViewBackground.bottomAnchor, constant: -padding),
+
+      currentTimeLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
+      currentTimeLabel.bottomAnchor.constraint(equalTo: progressViewBackground.topAnchor, constant: -8),
 
       durationLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
       durationLabel.bottomAnchor.constraint(equalTo: progressViewBackground.topAnchor, constant: -8),
@@ -95,12 +106,17 @@ final class PlayerFieldItem: NSToolbarItem, NSTextFieldDelegate {
   }
 
   @objc func set(currentTime: TimeInterval, duration: TimeInterval) {
+    let paragraphStyle = NSMutableParagraphStyle()
+    paragraphStyle.alignment = .left
+    playerView.currentTimeLabel.attributedStringValue = NSAttributedString(string: Utility.formatSecondsToHMS(currentTime), attributes: [
+      .font: NSFont.systemFont(ofSize: 10),
+      .paragraphStyle: paragraphStyle
+    ])
+
     if duration.isNaN {
       playerView.durationLabel.isHidden = true
     } else {
       playerView.durationLabel.isHidden = false
-      let paragraphStyle = NSMutableParagraphStyle()
-      paragraphStyle.alignment = .left
       playerView.durationLabel.attributedStringValue = NSAttributedString(string: Utility.formatSecondsToHMS(duration), attributes: [
         .font: NSFont.systemFont(ofSize: 10),
         .paragraphStyle: paragraphStyle
