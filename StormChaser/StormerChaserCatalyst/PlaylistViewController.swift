@@ -7,7 +7,12 @@
 
 import UIKit
 
-class PlaylistViewController: UIViewController {
+protocol PlaylistViewControllerDelegate: AnyObject {
+  func playlistViewController(_ playlistViewController: PlaylistViewController, playMediaItem mediaItem: MediaItem)
+}
+
+final class PlaylistViewController: UIViewController {
+  weak var delegate: PlaylistViewControllerDelegate?
 
   let model: Model
   init(model: Model) {
@@ -97,6 +102,28 @@ class PlaylistViewController: UIViewController {
     var snapshot = NSDiffableDataSourceSectionSnapshot<MediaItem>()
     snapshot.append(items)
     dataSource.apply(snapshot, to: "", animatingDifferences: animated)
+  }
+
+  // MARK: - Actions
+
+  @objc func playSelectedItem(_ sender:Any) {
+    if let indexPath = collectionView.indexPathsForSelectedItems?.first {
+      let mediaItem = dataSource.itemIdentifier(for: indexPath)!
+      delegate?.playlistViewController(self, playMediaItem: mediaItem)
+    }
+  }
+
+  override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+    if action == #selector(playSelectedItem(_:)) {
+      return collectionView.indexPathsForSelectedItems?.first != nil
+    }
+    return false
+  }
+
+  override var keyCommands: [UIKeyCommand]? {
+    return [
+      UIKeyCommand(title: "Play", action: NSSelectorFromString("playSelectedItem:"), input:"\r", modifierFlags:[])
+    ]
   }
 }
 
