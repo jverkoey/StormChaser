@@ -25,6 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   var playlistController: PlaylistViewController!
 
   let audioPlayer = AVPlayer()
+  var loadedUrl: URL?
 
 #if targetEnvironment(macCatalyst)
   var playerFieldItem: NSToolbarItem?
@@ -107,7 +108,7 @@ extension SceneDelegate: NSToolbarDelegate {
     let item = NSToolbarItem(itemIdentifier: itemIdentifier)
     if itemIdentifier == NSToolbarItem.Identifier.play {
       item.image = UIImage(systemName: "play.fill")
-      item.action = NSSelectorFromString("playSelectedItem:")
+      item.action = NSSelectorFromString("togglePlaybackOfSelectedItem:")
     }
     return item
   }
@@ -137,9 +138,16 @@ extension SceneDelegate: SidebarViewControllerDelegate {
 }
 
 extension SceneDelegate: PlaylistViewControllerDelegate {
-  func playlistViewController(_ playlistViewController: PlaylistViewController, playMediaItem mediaItem: MediaItem) {
+  private func updatePlayer(with mediaItem: MediaItem) {
     playerFieldItem?.setTrackTitle(mediaItem.title)
+  }
 
+  private func loadAndPlay(mediaItem: MediaItem) {
+    updatePlayer(with: mediaItem)
+
+    loadedUrl = mediaItem.url
+
+    // Playing a new file
     audioPlayer.pause()
 
     if let url = mediaItem.url {
@@ -147,5 +155,36 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
       audioPlayer.replaceCurrentItem(with: playerItem)
       audioPlayer.play()
     }
+  }
+
+  func playlistViewController(_ playlistViewController: PlaylistViewController, togglePlaybackOfMediaItem mediaItem: MediaItem) {
+    if loadedUrl == nil {
+      loadAndPlay(mediaItem: mediaItem)
+      return
+    }
+    if audioPlayer.timeControlStatus == .playing {
+      audioPlayer.pause()
+    } else {
+      audioPlayer.play()
+    }
+  }
+
+  func playlistViewController(_ playlistViewController: PlaylistViewController, playMediaItem mediaItem: MediaItem) {
+    updatePlayer(with: mediaItem)
+
+    if loadedUrl == mediaItem.url {
+      let targetTime = CMTime(seconds: 0, preferredTimescale: 600)
+      audioPlayer.seek(to: targetTime)
+      if audioPlayer.timeControlStatus != .playing {
+        audioPlayer.play()
+      }
+      return
+    }
+
+    loadAndPlay(mediaItem: mediaItem)
+  }
+
+  func playlistViewControllerIsMediaPlaying(_ playlistViewController: PlaylistViewController) -> Bool {
+    return audioPlayer.timeControlStatus == .playing
   }
 }

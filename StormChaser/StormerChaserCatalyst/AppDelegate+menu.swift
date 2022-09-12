@@ -22,10 +22,12 @@ extension AppDelegate {
     /* History Menu */
 
     var controlsChildren:[UIMenuElement] = []
-    controlsChildren.append(UIKeyCommand(title: "Play", action: NSSelectorFromString("playSelectedItem:"), input:" ", modifierFlags:[]))
+    controlsChildren.append(UIKeyCommand(title: "Play", action: NSSelectorFromString("togglePlaybackOfSelectedItem:"), input:" ", modifierFlags:[]))
 
     let controlsMenu = UIMenu(title: "Controls", children: controlsChildren)
 
     builder.insertSibling(controlsMenu, afterMenu: .view)
   }
+
+  
 }

@@ -8,7 +8,9 @@
 import UIKit
 
 protocol PlaylistViewControllerDelegate: AnyObject {
+  func playlistViewController(_ playlistViewController: PlaylistViewController, togglePlaybackOfMediaItem mediaItem: MediaItem)
   func playlistViewController(_ playlistViewController: PlaylistViewController, playMediaItem mediaItem: MediaItem)
+  func playlistViewControllerIsMediaPlaying(_ playlistViewController: PlaylistViewController) -> Bool
 }
 
 final class PlaylistViewController: UIViewController {
@@ -106,7 +108,14 @@ final class PlaylistViewController: UIViewController {
 
   // MARK: - Actions
 
-  @objc func playSelectedItem(_ sender:Any) {
+  @objc func togglePlaybackOfSelectedItem(_ sender: Any) {
+    if let indexPath = collectionView.indexPathsForSelectedItems?.first {
+      let mediaItem = dataSource.itemIdentifier(for: indexPath)!
+      delegate?.playlistViewController(self, togglePlaybackOfMediaItem: mediaItem)
+    }
+  }
+
+  @objc func playSelectedItem(_ sender: Any) {
     if let indexPath = collectionView.indexPathsForSelectedItems?.first {
       let mediaItem = dataSource.itemIdentifier(for: indexPath)!
       delegate?.playlistViewController(self, playMediaItem: mediaItem)
@@ -114,10 +123,19 @@ final class PlaylistViewController: UIViewController {
   }
 
   override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-    if action == #selector(playSelectedItem(_:)) {
+    if action == #selector(togglePlaybackOfSelectedItem(_:)) || action == #selector(playSelectedItem(_:)) {
+      // TODO: togglePlaybackOfSelectedItem should technically just check if an item is loaded at all.
       return collectionView.indexPathsForSelectedItems?.first != nil
     }
-    return false
+    return super.canPerformAction(action, withSender: sender)
+  }
+
+  override func validate(_ command: UICommand) {
+    super.validate(command)
+
+    if command.action == NSSelectorFromString("togglePlaybackOfSelectedItem:") {
+      command.title = delegate!.playlistViewControllerIsMediaPlaying(self) ? "Pause" : "Play"
+    }
   }
 
   override var keyCommands: [UIKeyCommand]? {
