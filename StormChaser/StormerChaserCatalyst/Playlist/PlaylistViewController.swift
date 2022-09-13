@@ -16,11 +16,17 @@ protocol PlaylistViewControllerDelegate: AnyObject {
 final class PlaylistViewController: UIViewController {
   weak var delegate: PlaylistViewControllerDelegate?
 
+  let playlistInfoViewController = PlaylistInfoViewController()
+  let infoPaneViewController = InfoPaneViewController()
+
   let model: Model
   init(model: Model) {
     self.model = model
 
     super.init(nibName: nil, bundle: nil)
+
+    addChild(playlistInfoViewController)
+    addChild(infoPaneViewController)
   }
 
   required init?(coder: NSCoder) {
@@ -62,13 +68,33 @@ final class PlaylistViewController: UIViewController {
     collectionView.delegate = self
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.selectionFollowsFocus = true
+
+    playlistInfoViewController.view.translatesAutoresizingMaskIntoConstraints = false
+    infoPaneViewController.view.translatesAutoresizingMaskIntoConstraints = false
+
+    view.addSubview(playlistInfoViewController.view)
     view.addSubview(collectionView)
+    view.addSubview(infoPaneViewController.view)
+
+    playlistInfoViewController.didMove(toParent: self)
+    infoPaneViewController.didMove(toParent: self)
 
     NSLayoutConstraint.activate([
-      collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      playlistInfoViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      playlistInfoViewController.view.heightAnchor.constraint(equalToConstant: 400),
+
+      collectionView.topAnchor.constraint(equalTo: playlistInfoViewController.view.bottomAnchor),
       collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+
+      playlistInfoViewController.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-      collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+      playlistInfoViewController.view.trailingAnchor.constraint(equalTo: infoPaneViewController.view.leadingAnchor),
+      collectionView.trailingAnchor.constraint(equalTo: infoPaneViewController.view.leadingAnchor),
+      infoPaneViewController.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+      infoPaneViewController.view.widthAnchor.constraint(equalToConstant: 350),
+
+      infoPaneViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      infoPaneViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
     ])
 
     let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, MediaItem> { (cell, indexPath, item) in

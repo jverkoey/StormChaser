@@ -44,7 +44,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       guard let strongSelf = self else {
         return
       }
-      var duration = strongSelf.audioPlayer.currentItem!.duration.seconds
+      let duration = strongSelf.audioPlayer.currentItem!.duration.seconds
       strongSelf.playerFieldItem?.set(currentTime: time.seconds, duration: duration)
     }
 
@@ -218,7 +218,7 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
 
 extension SceneDelegate: PlayerViewDelegate {
   func playerView(_ playerView: AnyObject, didScrubToPosition position: Double) {
-    var duration = audioPlayer.currentItem!.duration.seconds
+    let duration = audioPlayer.currentItem!.duration.seconds
     let targetTime = CMTime(seconds: position * duration, preferredTimescale: 600)
     audioPlayer.seek(to: targetTime)
   }
