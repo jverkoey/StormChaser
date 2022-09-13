@@ -36,6 +36,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 #endif
   let playPauseItem = NSToolbarItem(itemIdentifier: NSToolbarItem.Identifier.play)
 
+  let model = Model()
+
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
 
@@ -48,7 +50,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       strongSelf.playerFieldItem?.set(currentTime: time.seconds, duration: duration)
     }
 
-    let model = Model()
     if let modelBookmark = UserDefaults.standard.data(forKey: UserDefaults.modelKey) {
       var isStale = false
       let url = try! URL(resolvingBookmarkData: modelBookmark, bookmarkDataIsStale: &isStale)
@@ -180,6 +181,12 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
       audioPlayer.play()
     }
     updatePlaybackState()
+  }
+
+  func playlistViewController(_ playlistViewController: PlaylistViewController, didChangePlaylist playlist: Playlist, name: String) {
+    model.setPlaylist(playlist, name: name)
+
+    sidebar.applySnapshot(animated: false)
   }
 
   func playlistViewController(_ playlistViewController: PlaylistViewController, togglePlaybackOfMediaItem mediaItem: MediaItem) {

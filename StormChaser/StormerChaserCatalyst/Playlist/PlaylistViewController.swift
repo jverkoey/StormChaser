@@ -11,6 +11,8 @@ protocol PlaylistViewControllerDelegate: AnyObject {
   func playlistViewController(_ playlistViewController: PlaylistViewController, togglePlaybackOfMediaItem mediaItem: MediaItem)
   func playlistViewController(_ playlistViewController: PlaylistViewController, playMediaItem mediaItem: MediaItem)
   func playlistViewControllerIsMediaPlaying(_ playlistViewController: PlaylistViewController) -> Bool
+
+  func playlistViewController(_ playlistViewController: PlaylistViewController, didChangePlaylist playlist: Playlist, name: String)
 }
 
 final class PlaylistViewController: UIViewController {
@@ -25,6 +27,8 @@ final class PlaylistViewController: UIViewController {
 
     super.init(nibName: nil, bundle: nil)
 
+    playlistInfoViewController.delegate = self
+
     addChild(playlistInfoViewController)
     addChild(infoPaneViewController)
   }
@@ -35,6 +39,7 @@ final class PlaylistViewController: UIViewController {
 
   var playlist: Playlist? {
     didSet {
+      playlistInfoViewController.playlist = playlist
       if let playlist = playlist {
         items = model.items(in: playlist)
         if let selectedItems = collectionView.indexPathsForSelectedItems {
@@ -182,5 +187,11 @@ extension PlaylistViewController: UICollectionViewDelegate {
 //    let system = UIFocusSystem.focusSystem(for: self.view.window!)
 //    let cell = collectionView.cellForItem(at: indexPath)!
 //    system?.requestFocusUpdate(to: cell)
+  }
+}
+
+extension PlaylistViewController: PlaylistInfoDelegate {
+  func playlistInfoViewController(_ playlistInfoViewController: PlaylistInfoViewController, didChangePlaylist playlist: Playlist, name: String) {
+    delegate?.playlistViewController(self, didChangePlaylist: playlist, name: name)
   }
 }

@@ -100,6 +100,16 @@ extension Model {
     }
   }
 
+  func setPlaylist(_ playlist: Playlist, name: String) {
+    let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)
+
+    if url!.startAccessingSecurityScopedResource() {
+      try! db!.run(selector.update(PlaylistsTable.name <- name))
+      playlists = Model.buildPlaylists(db: db!)
+      url!.stopAccessingSecurityScopedResource()
+    }
+  }
+
   private static func buildPlaylists(db: Connection) -> [Playlist] {
     // Build an in-memory map of id->playlist.
     var playlistMap: [Int64: Playlist] = [:]
