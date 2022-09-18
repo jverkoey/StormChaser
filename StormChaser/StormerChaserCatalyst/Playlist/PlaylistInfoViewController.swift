@@ -13,7 +13,9 @@ protocol PlaylistInfoDelegate: AnyObject {
 
 final class PlaylistInfoViewController: UIViewController {
   weak var delegate: PlaylistInfoDelegate?
-  init() {
+  let model: Model
+  init(model: Model) {
+    self.model = model
     super.init(nibName: nil, bundle: nil)
   }
 
@@ -71,9 +73,15 @@ final class PlaylistInfoViewController: UIViewController {
     }
   }
 
-  var playlist: Playlist? {
+  var playlistId: Int64? {
     didSet {
+      if let playlistId = playlistId {
+        playlist = model.playlist(withId: playlistId)
+      } else {
+        playlist = nil
+      }
       nameLabel.text = playlist?.name
     }
   }
+  private var playlist: Playlist?
 }

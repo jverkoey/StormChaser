@@ -19,12 +19,13 @@ protocol PlaylistViewControllerDelegate: AnyObject {
 final class PlaylistViewController: UIViewController {
   weak var delegate: PlaylistViewControllerDelegate?
 
-  let playlistInfoViewController = PlaylistInfoViewController()
+  let playlistInfoViewController: PlaylistInfoViewController
   let infoPaneViewController = InfoPaneViewController()
 
   let model: Model
   init(model: Model) {
     self.model = model
+    self.playlistInfoViewController = PlaylistInfoViewController(model: model)
 
     super.init(nibName: nil, bundle: nil)
 
@@ -38,28 +39,30 @@ final class PlaylistViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
-  var playlist: Playlist? {
+  var playlistId: Int64? {
     didSet {
-      playlistInfoViewController.playlist = playlist
-      if let playlist = playlist {
-        items = model.items(in: playlist)
-        if let selectedItems = collectionView.indexPathsForSelectedItems {
-          for indexPath in selectedItems {
-            collectionView.deselectItem(at: indexPath, animated: false)
+      playlistInfoViewController.playlistId = playlistId
+      if let playlistId = playlistId {
+        playlist = model.playlist(withId: playlistId)
+        if let playlist = playlist {
+          items = model.items(in: playlist)
+          if let selectedItems = collectionView.indexPathsForSelectedItems {
+            for indexPath in selectedItems {
+              collectionView.deselectItem(at: indexPath, animated: false)
+            }
           }
+        } else {
+          items = nil
         }
       } else {
+        playlist = nil
         items = nil
       }
+      applySnapshot(animated: false)
     }
   }
-  var items: [MediaItem]? {
-    didSet {
-      if items != nil {
-        applySnapshot(animated: false)
-      }
-    }
-  }
+  private var playlist: Playlist?
+  private var items: [MediaItem]?
 
   var collectionView: UICollectionView!
   typealias DiffableDataSource = UICollectionViewDiffableDataSource<String, MediaItem>

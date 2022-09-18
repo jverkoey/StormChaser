@@ -149,7 +149,7 @@ extension SceneDelegate: NSToolbarDelegate {
 
 extension SceneDelegate: SidebarViewControllerDelegate {
   func sidebarViewController(_ sidebarViewController: SidebarViewController, didSelectPlaylist playlist: Playlist) {
-    playlistController.playlist = model.playlist(withId: playlist.id)
+    playlistController.playlistId = playlist.id
   }
 }
 
@@ -186,7 +186,9 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
   func playlistViewController(_ playlistViewController: PlaylistViewController, didChangePlaylist playlist: Playlist, name: String) {
     model.setPlaylist(playlist, name: name)
 
-    playlistViewController.playlist = model.playlist(withId: playlist.id)!
+    // TODO: Change this to some sort of eventing mechanism on a given playlist id.
+    playlistViewController.playlistId = playlist.id
+
     sidebar.applySnapshot(animated: false)
   }
 
