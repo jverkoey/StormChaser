@@ -6,6 +6,7 @@
 //
 
 import AppKit
+import DSWaveformImage
 
 @objc protocol PlayerViewDelegate: AnyObject {
   func playerView(_ playerView: AnyObject, didScrubToPosition position: Double)
