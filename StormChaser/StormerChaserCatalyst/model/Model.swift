@@ -95,10 +95,23 @@ extension Model {
     return playlistMap[id]
   }
 
-  func movePlaylist(_ playlist: Playlist, into destinationPlaylist: Playlist) {
-    let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)
+  func moveItem(id: Int64, fromIndex: Int, toIndex: Int, in playlist: Playlist) {
+    assert(!playlist.items.isEmpty)
+    var playlistItems = playlist.items.components(separatedBy: ",")
+    playlistItems.swapAt(fromIndex, toIndex)
+    let items = playlistItems.joined(separator: ",")
 
     if url!.startAccessingSecurityScopedResource() {
+      let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)
+      try! db!.run(selector.update(PlaylistsTable.items <- items))
+      (playlists, playlistMap) = Model.buildPlaylists(db: db!)
+      url!.stopAccessingSecurityScopedResource()
+    }
+  }
+
+  func movePlaylist(_ playlist: Playlist, into destinationPlaylist: Playlist) {
+    if url!.startAccessingSecurityScopedResource() {
+      let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)
       try! db!.run(selector.update(PlaylistsTable.parentId <- destinationPlaylist.id))
       (playlists, playlistMap) = Model.buildPlaylists(db: db!)
       url!.stopAccessingSecurityScopedResource()
@@ -106,9 +119,8 @@ extension Model {
   }
 
   func setPlaylist(_ playlist: Playlist, name: String) {
-    let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)
-
     if url!.startAccessingSecurityScopedResource() {
+      let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)
       try! db!.run(selector.update(PlaylistsTable.name <- name))
       (playlists, playlistMap) = Model.buildPlaylists(db: db!)
       url!.stopAccessingSecurityScopedResource()

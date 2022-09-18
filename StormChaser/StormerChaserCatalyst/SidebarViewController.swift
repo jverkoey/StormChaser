@@ -57,9 +57,6 @@ final class SidebarViewController: UIViewController {
       collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
     ])
 
-    let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongGesture(gesture:)))
-    collectionView.addGestureRecognizer(longPressGesture)
-
     let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Playlist> { (cell, indexPath, playlist) in
       var content = cell.defaultContentConfiguration()
       content.text = playlist.name
@@ -93,22 +90,6 @@ final class SidebarViewController: UIViewController {
 
   func saveExpansionState() {
     UserDefaults.standard.set(Array(expandedNodes), forKey: UserDefaults.expandedPlaylists)
-  }
-
-  @objc func handleLongGesture(gesture: UILongPressGestureRecognizer) {
-    switch(gesture.state) {
-    case .began:
-      guard let selectedIndexPath = collectionView.indexPathForItem(at: gesture.location(in: collectionView)) else {
-        break
-      }
-      collectionView.beginInteractiveMovementForItem(at: selectedIndexPath)
-    case .changed:
-      collectionView.updateInteractiveMovementTargetPosition(gesture.location(in: gesture.view))
-    case .ended:
-      collectionView.endInteractiveMovement()
-    default:
-      collectionView.cancelInteractiveMovement()
-    }
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -220,7 +201,7 @@ extension SidebarViewController: UICollectionViewDropDelegate {
   }
 }
 
-final class PlaylistItem: NSObject, NSItemProviderWriting, NSItemProviderReading {
+private final class PlaylistItem: NSObject, NSItemProviderWriting, NSItemProviderReading {
   let playlist: Int64
   init(playlist: Int64) {
     self.playlist = playlist

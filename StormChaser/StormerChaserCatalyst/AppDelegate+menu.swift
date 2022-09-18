@@ -28,6 +28,4 @@ extension AppDelegate {
 
     builder.insertSibling(controlsMenu, afterMenu: .view)
   }
-
-  
 }

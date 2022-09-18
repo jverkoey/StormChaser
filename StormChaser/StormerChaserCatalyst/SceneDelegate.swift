@@ -149,7 +149,7 @@ extension SceneDelegate: NSToolbarDelegate {
 
 extension SceneDelegate: SidebarViewControllerDelegate {
   func sidebarViewController(_ sidebarViewController: SidebarViewController, didSelectPlaylist playlist: Playlist) {
-    playlistController.playlist = playlist
+    playlistController.playlist = model.playlist(withId: playlist.id)
   }
 }
 

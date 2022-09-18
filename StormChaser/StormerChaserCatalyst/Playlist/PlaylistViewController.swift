@@ -5,6 +5,7 @@
 //  Created by Jeff Verkoeyen on 9/10/22.
 //
 
+import UniformTypeIdentifiers
 import UIKit
 
 protocol PlaylistViewControllerDelegate: AnyObject {
@@ -73,6 +74,9 @@ final class PlaylistViewController: UIViewController {
     collectionView.delegate = self
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     collectionView.selectionFollowsFocus = true
+    collectionView.dragInteractionEnabled = true
+    collectionView.dragDelegate = self
+    collectionView.dropDelegate = self
 
     playlistInfoViewController.view.translatesAutoresizingMaskIntoConstraints = false
     infoPaneViewController.view.translatesAutoresizingMaskIntoConstraints = false
@@ -209,5 +213,65 @@ extension PlaylistViewController: UICollectionViewDelegate {
 extension PlaylistViewController: PlaylistInfoDelegate {
   func playlistInfoViewController(_ playlistInfoViewController: PlaylistInfoViewController, didChangePlaylist playlist: Playlist, name: String) {
     delegate?.playlistViewController(self, didChangePlaylist: playlist, name: name)
+  }
+}
+
+extension PlaylistViewController: UICollectionViewDragDelegate {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    itemsForBeginning session: UIDragSession,
+    at indexPath: IndexPath
+  ) -> [UIDragItem] {
+    let mediaItem = dataSource.itemIdentifier(for: indexPath)!
+    let item = NSItemProvider(object: TransportableMediaItem(mediaId: mediaItem.id))
+    let dragItem = UIDragItem(itemProvider: item)
+    return [dragItem]
+  }
+}
+
+extension PlaylistViewController: UICollectionViewDropDelegate {
+  func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+    guard collectionView.hasActiveDrag else {
+      return UICollectionViewDropProposal(operation: .cancel)
+    }
+    return UICollectionViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+  }
+
+  func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
+    assert(coordinator.items.count == 1)
+    let item = coordinator.items[0]
+    let mediaItem = dataSource.itemIdentifier(for: item.sourceIndexPath!)!
+    guard let destinationIndexPath = coordinator.destinationIndexPath else {
+      return
+    }
+
+    model.moveItem(
+      id: mediaItem.id,
+      fromIndex: item.sourceIndexPath!.row,
+      toIndex: destinationIndexPath.row,
+      in: playlist!
+    )
+
+    playlist = model.playlist(withId: playlist!.id)
+  }
+}
+
+private final class TransportableMediaItem: NSObject, NSItemProviderWriting, NSItemProviderReading {
+  let mediaId: Int64
+  init(mediaId: Int64) {
+    self.mediaId = mediaId
+  }
+
+  static var readableTypeIdentifiersForItemProvider: [String] = [UTType.commaSeparatedText.identifier]
+
+  static func object(withItemProviderData data: Data, typeIdentifier: String) throws -> TransportableMediaItem {
+    return TransportableMediaItem(mediaId: Int64(String(data: data, encoding: .ascii)!)!)
+  }
+
+  static var writableTypeIdentifiersForItemProvider: [String] = [UTType.commaSeparatedText.identifier]
+
+  func loadData(withTypeIdentifier typeIdentifier: String, forItemProviderCompletionHandler completionHandler: @escaping (Data?, Error?) -> Void) -> Progress? {
+    completionHandler("\(mediaId)".data(using: .ascii), nil)
+    return nil
   }
 }
