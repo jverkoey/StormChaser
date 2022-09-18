@@ -7,6 +7,8 @@
 
 import Foundation
 
+// TODO: Need to find a way to ensure that playlist data can be mutated and invalidated properly
+// throughout the app so that views aren't holding on to stale instances of a given view.
 final class Playlist: Equatable, Identifiable, Hashable {
   internal init(id: Int64, parentId: Int64?, name: String, items: String, children: [Playlist]? = nil) {
     self.id = id
