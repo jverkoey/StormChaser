@@ -186,6 +186,7 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
   func playlistViewController(_ playlistViewController: PlaylistViewController, didChangePlaylist playlist: Playlist, name: String) {
     model.setPlaylist(playlist, name: name)
 
+    playlistViewController.playlist = model.playlist(withId: playlist.id)!
     sidebar.applySnapshot(animated: false)
   }
 

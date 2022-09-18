@@ -12,13 +12,14 @@ import SQLite
 final class Model {
   private var db: Connection?
   var playlists: [Playlist] = []
+  private var playlistMap: [Int64: Playlist] = [:]
 
   var url: URL? {
     didSet {
       if let url = url {
         let db = try! Connection(url.appendingPathComponent("hurricane.sqlite3").path)
         self.db = db
-        playlists = Model.buildPlaylists(db: db)
+        (playlists, playlistMap) = Model.buildPlaylists(db: db)
       } else {
         db = nil
         playlists = []
@@ -90,12 +91,16 @@ final class Model {
 
 extension Model {
 
+  func playlist(withId id: Int64) -> Playlist? {
+    return playlistMap[id]
+  }
+
   func movePlaylist(_ playlist: Playlist, into destinationPlaylist: Playlist) {
     let selector = PlaylistsTable.table.filter(PlaylistsTable.id == playlist.id)
 
     if url!.startAccessingSecurityScopedResource() {
       try! db!.run(selector.update(PlaylistsTable.parentId <- destinationPlaylist.id))
-      playlists = Model.buildPlaylists(db: db!)
+      (playlists, playlistMap) = Model.buildPlaylists(db: db!)
       url!.stopAccessingSecurityScopedResource()
     }
   }
@@ -105,12 +110,12 @@ extension Model {
 
     if url!.startAccessingSecurityScopedResource() {
       try! db!.run(selector.update(PlaylistsTable.name <- name))
-      playlists = Model.buildPlaylists(db: db!)
+      (playlists, playlistMap) = Model.buildPlaylists(db: db!)
       url!.stopAccessingSecurityScopedResource()
     }
   }
 
-  private static func buildPlaylists(db: Connection) -> [Playlist] {
+  private static func buildPlaylists(db: Connection) -> ([Playlist], [Int64: Playlist]) {
     // Build an in-memory map of id->playlist.
     var playlistMap: [Int64: Playlist] = [:]
     for row in try! db.prepare(PlaylistsTable.table
@@ -143,7 +148,10 @@ extension Model {
     for playlist in playlistMap.values {
       playlist.children?.sort(by: playlistSortComparator)
     }
-    return Array(playlistMap.values).filter { $0.parentId == nil }.sorted(by: playlistSortComparator)
+    return (
+      Array(playlistMap.values).filter { $0.parentId == nil }.sorted(by: playlistSortComparator),
+      playlistMap
+    )
   }
 }
 
