@@ -1,4 +1,4 @@
-name: Presubmit
+name: Continuous
 on: [push]
 jobs:
   build:
