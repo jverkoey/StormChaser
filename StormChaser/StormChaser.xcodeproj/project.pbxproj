@@ -13,7 +13,6 @@
 		6643736928CD4CF80008AE36 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6643736828CD4CF80008AE36 /* Assets.xcassets */; };
 		6643736C28CD4CF80008AE36 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6643736A28CD4CF80008AE36 /* LaunchScreen.storyboard */; };
 		6643737228CD75EA0008AE36 /* SidebarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643737128CD75EA0008AE36 /* SidebarViewController.swift */; };
-		6643737728CD7A6C0008AE36 /* HurricaneDB in Frameworks */ = {isa = PBXBuildFile; productRef = 6643737628CD7A6C0008AE36 /* HurricaneDB */; };
 		6643737928CD7BEA0008AE36 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643737828CD7BEA0008AE36 /* Model.swift */; };
 		6643737E28CDA92B0008AE36 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643737D28CDA92B0008AE36 /* Playlist.swift */; };
 		6643738028CDA99D0008AE36 /* MediaItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6643737F28CDA99D0008AE36 /* MediaItem.swift */; };
@@ -24,6 +23,7 @@
 		668DD79528CEA691004DFA8D /* StormchaserBridge.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 668DD78528CEA652004DFA8D /* StormchaserBridge.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		668DD79728CEA6BC004DFA8D /* PlayerFieldItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668DD79628CEA6BC004DFA8D /* PlayerFieldItem.swift */; };
 		668DD79928CEC1FD004DFA8D /* AppDelegate+menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668DD79828CEC1FD004DFA8D /* AppDelegate+menu.swift */; };
+		66913A0028D831940071AC43 /* HurricaneDB in Frameworks */ = {isa = PBXBuildFile; productRef = 669139FF28D831940071AC43 /* HurricaneDB */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,7 +78,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6643737728CD7A6C0008AE36 /* HurricaneDB in Frameworks */,
+				66913A0028D831940071AC43 /* HurricaneDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,12 +202,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				6665C0FA28D8317A0094A652 /* PBXTargetDependency */,
 				668DD79228CEA65D004DFA8D /* PBXTargetDependency */,
-				6643737528CD7A680008AE36 /* PBXTargetDependency */,
 			);
 			name = StormChaser;
 			packageProductDependencies = (
-				6643737628CD7A6C0008AE36 /* HurricaneDB */,
+				669139FF28D831940071AC43 /* HurricaneDB */,
 			);
 			productName = StormerChaserCatalyst;
 			productReference = 6643735D28CD4CF70008AE36 /* StormChaser.app */;
@@ -323,13 +323,13 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		6643737528CD7A680008AE36 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = 6643737428CD7A680008AE36 /* HurricaneDB */;
-		};
 		6665C0F628D823EC0094A652 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			productRef = 6665C0F528D823EC0094A652 /* DSWaveformImage */;
+		};
+		6665C0FA28D8317A0094A652 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = 6665C0F928D8317A0094A652 /* HurricaneDB */;
 		};
 		668DD79228CEA65D004DFA8D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -639,14 +639,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6643737428CD7A680008AE36 /* HurricaneDB */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = HurricaneDB;
-		};
-		6643737628CD7A6C0008AE36 /* HurricaneDB */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = HurricaneDB;
-		};
 		6665C0F528D823EC0094A652 /* DSWaveformImage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DSWaveformImage;
@@ -654,6 +646,14 @@
 		6665C0F728D823F50094A652 /* DSWaveformImage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DSWaveformImage;
+		};
+		6665C0F928D8317A0094A652 /* HurricaneDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HurricaneDB;
+		};
+		669139FF28D831940071AC43 /* HurricaneDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = HurricaneDB;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
