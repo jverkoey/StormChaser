@@ -71,6 +71,7 @@
 		668DD79628CEA6BC004DFA8D /* PlayerFieldItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerFieldItem.swift; sourceTree = "<group>"; };
 		668DD79828CEC1FD004DFA8D /* AppDelegate+menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppDelegate+menu.swift"; sourceTree = "<group>"; };
 		668DD79A28CEC804004DFA8D /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		66913A0128D8348F0071AC43 /* Default.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Default.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +97,7 @@
 		6639814B28CB0C87005E6BAA = {
 			isa = PBXGroup;
 			children = (
+				66913A0128D8348F0071AC43 /* Default.xcconfig */,
 				6639816628CB0C9F005E6BAA /* Packages */,
 				6643735E28CD4CF70008AE36 /* StormChaser */,
 				668DD78628CEA652004DFA8D /* StormchaserBridge */,
