@@ -4,7 +4,6 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: mxcl/xcodebuild@v1
       - name: Build
         run: xcodebuild build -project StormChaser/StormChaser.xcodeproj -scheme StormChaser -destination "platform=macOS"
 
