@@ -13,6 +13,7 @@ final class Model {
   private var db: Connection?
   var playlists: [Playlist] = []
   private var playlistMap: [Int64: Playlist] = [:]
+  private var mediaItemMap: [Int64: MediaItem] = [:]
 
   var canAccessAppleMusic: Bool? = nil
 
@@ -85,6 +86,8 @@ final class Model {
       )
     })
 
+    mediaItemMap.merge(itemMap) { _, new in new }
+
     return playlistOrder.map { itemMap[$0]! }
   }
 }
@@ -95,6 +98,10 @@ extension Model {
 
   func playlist(withId id: Int64) -> Playlist? {
     return playlistMap[id]
+  }
+
+  func mediaItem(withId id: Int64) -> MediaItem? {
+    return mediaItemMap[id]
   }
 
   func moveItem(id: Int64, fromIndex: Int, toIndex: Int, in playlist: Playlist) {

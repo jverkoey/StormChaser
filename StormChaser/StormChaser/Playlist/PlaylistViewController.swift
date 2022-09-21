@@ -20,12 +20,13 @@ final class PlaylistViewController: UIViewController {
   weak var delegate: PlaylistViewControllerDelegate?
 
   let playlistInfoViewController: PlaylistInfoViewController
-  let infoPaneViewController = InfoPaneViewController()
+  let infoPaneViewController: InfoPaneViewController
 
   let model: Model
   init(model: Model) {
     self.model = model
     self.playlistInfoViewController = PlaylistInfoViewController(model: model)
+    self.infoPaneViewController = InfoPaneViewController(model: model)
 
     super.init(nibName: nil, bundle: nil)
 
@@ -42,31 +43,46 @@ final class PlaylistViewController: UIViewController {
   var playlistId: Int64? {
     didSet {
       playlistInfoViewController.playlistId = playlistId
+
+      // TODO: Subscribe to updates of this object.
+
       if let playlistId = playlistId {
         playlist = model.playlist(withId: playlistId)
-        if let playlist = playlist {
-          items = model.items(in: playlist)
-          if let selectedItems = collectionView.indexPathsForSelectedItems {
-            for indexPath in selectedItems {
-              collectionView.deselectItem(at: indexPath, animated: false)
-            }
-          }
-        } else {
-          items = nil
-        }
       } else {
         playlist = nil
-        items = nil
       }
       applySnapshot(animated: false)
     }
   }
-  private var playlist: Playlist?
-  private var items: [MediaItem]?
+  private var playlist: Playlist? {
+    didSet {
+      if let playlist = playlist {
+        items = model.items(in: playlist)
+      } else {
+        items = nil
+      }
+    }
+  }
+  private var items: [MediaItem]? {
+    didSet {
+      if let selectedItems = collectionView.indexPathsForSelectedItems {
+        for indexPath in selectedItems {
+          collectionView.deselectItem(at: indexPath, animated: false)
+        }
+      }
+    }
+  }
 
   var collectionView: UICollectionView!
   typealias DiffableDataSource = UICollectionViewDiffableDataSource<String, MediaItem>
   var dataSource: DiffableDataSource!
+
+  private var infoPaneWidth: CGFloat = 400 {
+    didSet {
+      infoPaneWidthConstraint.constant = min(800, max(400, infoPaneWidth))
+    }
+  }
+  private var infoPaneWidthConstraint: NSLayoutConstraint!
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -84,12 +100,19 @@ final class PlaylistViewController: UIViewController {
     playlistInfoViewController.view.translatesAutoresizingMaskIntoConstraints = false
     infoPaneViewController.view.translatesAutoresizingMaskIntoConstraints = false
 
+    let splitterView = SplitterView()
+    splitterView.translatesAutoresizingMaskIntoConstraints = false
+    splitterView.delegate = self
+
     view.addSubview(playlistInfoViewController.view)
     view.addSubview(collectionView)
     view.addSubview(infoPaneViewController.view)
+    view.addSubview(splitterView)
 
     playlistInfoViewController.didMove(toParent: self)
     infoPaneViewController.didMove(toParent: self)
+
+    infoPaneWidthConstraint = infoPaneViewController.view.widthAnchor.constraint(equalToConstant: infoPaneWidth)
 
     NSLayoutConstraint.activate([
       playlistInfoViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -98,12 +121,17 @@ final class PlaylistViewController: UIViewController {
       collectionView.topAnchor.constraint(equalTo: playlistInfoViewController.view.bottomAnchor),
       collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
 
+      splitterView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      splitterView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+
       playlistInfoViewController.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
       collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-      playlistInfoViewController.view.trailingAnchor.constraint(equalTo: infoPaneViewController.view.leadingAnchor),
-      collectionView.trailingAnchor.constraint(equalTo: infoPaneViewController.view.leadingAnchor),
+      playlistInfoViewController.view.trailingAnchor.constraint(equalTo: collectionView.trailingAnchor),
+      splitterView.leadingAnchor.constraint(equalTo: collectionView.trailingAnchor, constant: -1),
+      splitterView.trailingAnchor.constraint(equalTo: infoPaneViewController.view.leadingAnchor),
       infoPaneViewController.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-      infoPaneViewController.view.widthAnchor.constraint(equalToConstant: 350),
+
+      infoPaneWidthConstraint,
 
       infoPaneViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
       infoPaneViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -199,6 +227,12 @@ final class PlaylistViewController: UIViewController {
   }
 }
 
+extension PlaylistViewController: SplitterViewDelegate {
+  func splitterView(_ splitterView: SplitterView, didTranslate offset: CGFloat) {
+    infoPaneWidth -= offset
+  }
+}
+
 extension PlaylistViewController: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
     return true
@@ -207,9 +241,8 @@ extension PlaylistViewController: UICollectionViewDelegate {
     return true
   }
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//    let system = UIFocusSystem.focusSystem(for: self.view.window!)
-//    let cell = collectionView.cellForItem(at: indexPath)!
-//    system?.requestFocusUpdate(to: cell)
+    let mediaItem = dataSource.itemIdentifier(for: indexPath)!
+    infoPaneViewController.mediaItemId = mediaItem.id
   }
 }
 

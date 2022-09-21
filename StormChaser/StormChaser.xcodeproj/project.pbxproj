@@ -19,6 +19,7 @@
 		665BA14928D04CC30094BA27 /* InfoPaneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665BA14828D04CC30094BA27 /* InfoPaneViewController.swift */; };
 		665BA14C28D053C60094BA27 /* PlaylistInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665BA14B28D053C60094BA27 /* PlaylistInfoViewController.swift */; };
 		6665C0F828D823F50094A652 /* DSWaveformImage in Frameworks */ = {isa = PBXBuildFile; productRef = 6665C0F728D823F50094A652 /* DSWaveformImage */; };
+		66714E6A28DADC6B005345A3 /* SplitterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E6928DADC6B005345A3 /* SplitterView.swift */; };
 		6687136228DAD16600BD4969 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6687136128DAD16600BD4969 /* MusadoraKit */; };
 		668DD78828CEA652004DFA8D /* StormchaserBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 668DD78728CEA652004DFA8D /* StormchaserBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668DD79528CEA691004DFA8D /* StormchaserBridge.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 668DD78528CEA652004DFA8D /* StormchaserBridge.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -67,6 +68,7 @@
 		665BA14828D04CC30094BA27 /* InfoPaneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoPaneViewController.swift; sourceTree = "<group>"; };
 		665BA14B28D053C60094BA27 /* PlaylistInfoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistInfoViewController.swift; sourceTree = "<group>"; };
 		6665C0F428D823D20094A652 /* DSWaveformImage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = DSWaveformImage; path = ../third_party/DSWaveformImage; sourceTree = "<group>"; };
+		66714E6928DADC6B005345A3 /* SplitterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitterView.swift; sourceTree = "<group>"; };
 		668DD78528CEA652004DFA8D /* StormchaserBridge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StormchaserBridge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		668DD78728CEA652004DFA8D /* StormchaserBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StormchaserBridge.h; sourceTree = "<group>"; };
 		668DD79628CEA6BC004DFA8D /* PlayerFieldItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerFieldItem.swift; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			children = (
 				6643736328CD4CF70008AE36 /* PlaylistViewController.swift */,
 				665BA14B28D053C60094BA27 /* PlaylistInfoViewController.swift */,
+				66714E6928DADC6B005345A3 /* SplitterView.swift */,
 			);
 			path = Playlist;
 			sourceTree = "<group>";
@@ -314,6 +317,7 @@
 				6643736228CD4CF70008AE36 /* SceneDelegate.swift in Sources */,
 				668DD79928CEC1FD004DFA8D /* AppDelegate+menu.swift in Sources */,
 				6643737228CD75EA0008AE36 /* SidebarViewController.swift in Sources */,
+				66714E6A28DADC6B005345A3 /* SplitterView.swift in Sources */,
 				6643737E28CDA92B0008AE36 /* Playlist.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
