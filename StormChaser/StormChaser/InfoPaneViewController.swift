@@ -18,10 +18,25 @@ final class InfoPaneViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
+  var tableView: UITableView!
   override func viewDidLoad() {
     super.viewDidLoad()
 
     view.backgroundColor = .systemBackground
+
+    tableView = UITableView(frame: view.bounds, style: .insetGrouped)
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    tableView.dataSource = self
+    tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+
+    view.addSubview(tableView)
+
+    NSLayoutConstraint.activate([
+      tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+      tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+      tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+    ])
   }
 
   var mediaItemId: Int64? {
@@ -32,6 +47,8 @@ final class InfoPaneViewController: UIViewController {
       } else {
         mediaItem = nil
       }
+
+      tableView.reloadData()
     }
   }
 
@@ -39,5 +56,23 @@ final class InfoPaneViewController: UIViewController {
     didSet {
       print(mediaItem)
     }
+  }
+}
+
+extension InfoPaneViewController: UITableViewDataSource {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    return 1
+  }
+
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+    var config = cell.textFieldConfiguration()
+    config.text = mediaItem?.title
+    cell.contentConfiguration = config
+    return cell
+  }
+
+  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    return "Title"
   }
 }

@@ -120,6 +120,10 @@ final class PlaylistViewController: UIViewController {
 
     infoPaneWidthConstraint = infoPaneViewController.view.widthAnchor.constraint(equalToConstant: infoPaneWidth)
 
+    if let infoWidth = UserDefaults.standard.value(forKey: UserDefaults.infoSidebarWidth) as? CGFloat {
+      infoPaneWidth = infoWidth
+    }
+
     NSLayoutConstraint.activate([
       playlistInfoViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
       playlistInfoViewController.view.heightAnchor.constraint(equalToConstant: 400),
@@ -236,6 +240,8 @@ final class PlaylistViewController: UIViewController {
 extension PlaylistViewController: SplitterViewDelegate {
   func splitterView(_ splitterView: SplitterView, didTranslate offset: CGFloat) {
     infoPaneWidth -= offset
+
+    UserDefaults.standard.setValue(infoPaneWidth, forKey: UserDefaults.infoSidebarWidth)
   }
 }
 

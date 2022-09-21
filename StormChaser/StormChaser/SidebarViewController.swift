@@ -13,6 +13,7 @@ extension UserDefaults {
   static let modelKey = "com.stormchaser.prefs.model"
   static let expandedPlaylists = "com.stormchaser.prefs.expanded_playlists"
   static let selectedPlaylist = "com.stormchaser.prefs.selected_playlist"
+  static let infoSidebarWidth = "com.stormchaser.prefs.info_sidebar_width"
 }
 
 protocol SidebarViewControllerDelegate: AnyObject {
