@@ -14,6 +14,8 @@ final class Model {
   var playlists: [Playlist] = []
   private var playlistMap: [Int64: Playlist] = [:]
 
+  var canAccessAppleMusic: Bool? = nil
+
   var url: URL? {
     didSet {
       if let url = url {

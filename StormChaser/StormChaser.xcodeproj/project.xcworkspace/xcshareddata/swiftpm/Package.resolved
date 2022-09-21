@@ -1,14 +1,25 @@
 {
-  "pins" : [
-    {
-      "identity" : "sqlite.swift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/stephencelis/SQLite.swift.git",
-      "state" : {
-        "revision" : "4d543d811ee644fa4cc4bfa0be996b4dd6ba0f54",
-        "version" : "0.13.3"
+  "object": {
+    "pins": [
+      {
+        "package": "MusadoraKit",
+        "repositoryURL": "https://github.com/rryam/MusadoraKit.git",
+        "state": {
+          "branch": null,
+          "revision": "1e0cd28cd8ee995cb8e1734db588069fceb412e9",
+          "version": "1.8.1"
+        }
+      },
+      {
+        "package": "SQLite.swift",
+        "repositoryURL": "https://github.com/stephencelis/SQLite.swift.git",
+        "state": {
+          "branch": null,
+          "revision": "4d543d811ee644fa4cc4bfa0be996b4dd6ba0f54",
+          "version": "0.13.3"
+        }
       }
-    }
-  ],
-  "version" : 2
+    ]
+  },
+  "version": 1
 }

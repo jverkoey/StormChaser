@@ -6,6 +6,8 @@
 //
 
 import AVKit
+import MusadoraKit
+import StoreKit
 import UniformTypeIdentifiers
 import UIKit
 
@@ -38,8 +40,36 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   let model = Model()
 
+  func disableAppleMusicBasedFeatures() {
+    model.canAccessAppleMusic = false
+  }
+
+  func enableAppleMusicBasedFeatures() {
+    model.canAccessAppleMusic = true
+//    Task {
+//      do {
+//        if #available(macCatalyst 16.0, *) {
+//          let search = try await MusadoraKit.catalogArtist(id: .init("877845967"))
+//          print(search.name)
+//          print(search.albums)
+//        } else {
+//          // Fallback on earlier versions
+//        }
+//      } catch {
+//      }
+//    }
+  }
+
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
+
+    SKCloudServiceController.requestAuthorization {(status: SKCloudServiceAuthorizationStatus) in
+      switch status {
+      case .denied, .restricted: self.disableAppleMusicBasedFeatures()
+      case .authorized: self.enableAppleMusicBasedFeatures()
+      default: break
+      }
+    }
 
     let interval = CMTime(seconds: 1, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
     audioPlayer.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in

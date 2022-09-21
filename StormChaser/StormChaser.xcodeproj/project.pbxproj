@@ -19,6 +19,7 @@
 		665BA14928D04CC30094BA27 /* InfoPaneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665BA14828D04CC30094BA27 /* InfoPaneViewController.swift */; };
 		665BA14C28D053C60094BA27 /* PlaylistInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 665BA14B28D053C60094BA27 /* PlaylistInfoViewController.swift */; };
 		6665C0F828D823F50094A652 /* DSWaveformImage in Frameworks */ = {isa = PBXBuildFile; productRef = 6665C0F728D823F50094A652 /* DSWaveformImage */; };
+		6687136228DAD16600BD4969 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6687136128DAD16600BD4969 /* MusadoraKit */; };
 		668DD78828CEA652004DFA8D /* StormchaserBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 668DD78728CEA652004DFA8D /* StormchaserBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668DD79528CEA691004DFA8D /* StormchaserBridge.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 668DD78528CEA652004DFA8D /* StormchaserBridge.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		668DD79728CEA6BC004DFA8D /* PlayerFieldItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 668DD79628CEA6BC004DFA8D /* PlayerFieldItem.swift */; };
@@ -80,6 +81,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				66913A0028D831940071AC43 /* HurricaneDB in Frameworks */,
+				6687136228DAD16600BD4969 /* MusadoraKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,6 +212,7 @@
 			name = StormChaser;
 			packageProductDependencies = (
 				669139FF28D831940071AC43 /* HurricaneDB */,
+				6687136128DAD16600BD4969 /* MusadoraKit */,
 			);
 			productName = StormerChaserCatalyst;
 			productReference = 6643735D28CD4CF70008AE36 /* StormChaser.app */;
@@ -266,6 +269,7 @@
 			);
 			mainGroup = 6639814B28CB0C87005E6BAA;
 			packageReferences = (
+				6687136028DAD16600BD4969 /* XCRemoteSwiftPackageReference "MusadoraKit" */,
 			);
 			productRefGroup = 6639815528CB0C87005E6BAA /* Products */;
 			projectDirPath = "";
@@ -478,7 +482,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 69Y7ARDN28;
+				DEVELOPMENT_TEAM = ZGWD8QJUPK;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StormChaser/Info.plist;
@@ -514,7 +518,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 69Y7ARDN28;
+				DEVELOPMENT_TEAM = ZGWD8QJUPK;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StormChaser/Info.plist;
@@ -642,6 +646,17 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		6687136028DAD16600BD4969 /* XCRemoteSwiftPackageReference "MusadoraKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rryam/MusadoraKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		6665C0F528D823EC0094A652 /* DSWaveformImage */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -654,6 +669,11 @@
 		6665C0F928D8317A0094A652 /* HurricaneDB */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HurricaneDB;
+		};
+		6687136128DAD16600BD4969 /* MusadoraKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6687136028DAD16600BD4969 /* XCRemoteSwiftPackageReference "MusadoraKit" */;
+			productName = MusadoraKit;
 		};
 		669139FF28D831940071AC43 /* HurricaneDB */ = {
 			isa = XCSwiftPackageProductDependency;
