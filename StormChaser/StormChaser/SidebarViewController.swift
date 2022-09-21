@@ -12,6 +12,7 @@ import UIKit
 extension UserDefaults {
   static let modelKey = "com.stormchaser.prefs.model"
   static let expandedPlaylists = "com.stormchaser.prefs.expanded_playlists"
+  static let selectedPlaylist = "com.stormchaser.prefs.selected_playlist"
 }
 
 protocol SidebarViewControllerDelegate: AnyObject {
@@ -85,6 +86,12 @@ final class SidebarViewController: UIViewController {
 
     if model.url != nil {
       applySnapshot(animated: false)
+    }
+
+    if let selectedId = UserDefaults.standard.value(forKey: UserDefaults.selectedPlaylist) as? Int64,
+       let selectedPlaylist = model.playlist(withId: selectedId) {
+      let indexPath = dataSource.indexPath(for: selectedPlaylist)
+      collectionView.selectItem(at: indexPath, animated: false, scrollPosition: UICollectionView.ScrollPosition.centeredVertically)
     }
   }
 
@@ -161,6 +168,8 @@ extension SidebarViewController: UICollectionViewDelegate {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     let playlist = dataSource.itemIdentifier(for: indexPath)!
     delegate?.sidebarViewController(self, didSelectPlaylist: playlist)
+
+    UserDefaults.standard.setValue(playlist.id, forKey: UserDefaults.selectedPlaylist)
   }
 }
 

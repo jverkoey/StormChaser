@@ -116,6 +116,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       titlebar.titleVisibility = .hidden
     }
 
+    if let selectedId = UserDefaults.standard.value(forKey: UserDefaults.selectedPlaylist) as? Int64 {
+      playlistController.playlistId = selectedId
+    }
+
     window.rootViewController = splitViewController
     window.makeKeyAndVisible()
 

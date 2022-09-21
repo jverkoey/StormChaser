@@ -51,7 +51,10 @@ final class PlaylistViewController: UIViewController {
       } else {
         playlist = nil
       }
-      applySnapshot(animated: false)
+
+      if isViewLoaded {
+        applySnapshot(animated: false)
+      }
     }
   }
   private var playlist: Playlist? {
@@ -65,6 +68,9 @@ final class PlaylistViewController: UIViewController {
   }
   private var items: [MediaItem]? {
     didSet {
+      guard isViewLoaded else {
+        return
+      }
       if let selectedItems = collectionView.indexPathsForSelectedItems {
         for indexPath in selectedItems {
           collectionView.deselectItem(at: indexPath, animated: false)
