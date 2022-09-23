@@ -21,6 +21,7 @@
 		6665C0F828D823F50094A652 /* DSWaveformImage in Frameworks */ = {isa = PBXBuildFile; productRef = 6665C0F728D823F50094A652 /* DSWaveformImage */; };
 		66714E6A28DADC6B005345A3 /* SplitterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E6928DADC6B005345A3 /* SplitterView.swift */; };
 		66714E6C28DAE841005345A3 /* TextFieldContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E6B28DAE841005345A3 /* TextFieldContentView.swift */; };
+		66714E6F28DD7BE4005345A3 /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 66714E6E28DD7BE4005345A3 /* ID3TagEditor */; };
 		6687136228DAD16600BD4969 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6687136128DAD16600BD4969 /* MusadoraKit */; };
 		668DD78828CEA652004DFA8D /* StormchaserBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 668DD78728CEA652004DFA8D /* StormchaserBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668DD79528CEA691004DFA8D /* StormchaserBridge.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 668DD78528CEA652004DFA8D /* StormchaserBridge.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -84,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66714E6F28DD7BE4005345A3 /* ID3TagEditor in Frameworks */,
 				66913A0028D831940071AC43 /* HurricaneDB in Frameworks */,
 				6687136228DAD16600BD4969 /* MusadoraKit in Frameworks */,
 			);
@@ -145,12 +147,12 @@
 				6643737328CD79AA0008AE36 /* StormChaser.entitlements */,
 				6643735F28CD4CF70008AE36 /* AppDelegate.swift */,
 				6643736128CD4CF70008AE36 /* SceneDelegate.swift */,
-				668DD79828CEC1FD004DFA8D /* AppDelegate+menu.swift */,
 				6643737128CD75EA0008AE36 /* SidebarViewController.swift */,
 				665BA14A28D053BC0094BA27 /* Playlist */,
 				665BA14828D04CC30094BA27 /* InfoPaneViewController.swift */,
 				66714E6928DADC6B005345A3 /* SplitterView.swift */,
 				66714E6B28DAE841005345A3 /* TextFieldContentView.swift */,
+				668DD79828CEC1FD004DFA8D /* AppDelegate+menu.swift */,
 				6643736828CD4CF80008AE36 /* Assets.xcassets */,
 				6643736A28CD4CF80008AE36 /* LaunchScreen.storyboard */,
 				6643736D28CD4CF80008AE36 /* Info.plist */,
@@ -219,6 +221,7 @@
 			packageProductDependencies = (
 				669139FF28D831940071AC43 /* HurricaneDB */,
 				6687136128DAD16600BD4969 /* MusadoraKit */,
+				66714E6E28DD7BE4005345A3 /* ID3TagEditor */,
 			);
 			productName = StormerChaserCatalyst;
 			productReference = 6643735D28CD4CF70008AE36 /* StormChaser.app */;
@@ -276,6 +279,7 @@
 			mainGroup = 6639814B28CB0C87005E6BAA;
 			packageReferences = (
 				6687136028DAD16600BD4969 /* XCRemoteSwiftPackageReference "MusadoraKit" */,
+				66714E6D28DD7BE4005345A3 /* XCRemoteSwiftPackageReference "ID3TagEditor" */,
 			);
 			productRefGroup = 6639815528CB0C87005E6BAA /* Products */;
 			projectDirPath = "";
@@ -655,6 +659,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		66714E6D28DD7BE4005345A3 /* XCRemoteSwiftPackageReference "ID3TagEditor" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/chicio/ID3TagEditor.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
 		6687136028DAD16600BD4969 /* XCRemoteSwiftPackageReference "MusadoraKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/rryam/MusadoraKit.git";
@@ -677,6 +689,11 @@
 		6665C0F928D8317A0094A652 /* HurricaneDB */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = HurricaneDB;
+		};
+		66714E6E28DD7BE4005345A3 /* ID3TagEditor */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66714E6D28DD7BE4005345A3 /* XCRemoteSwiftPackageReference "ID3TagEditor" */;
+			productName = ID3TagEditor;
 		};
 		6687136128DAD16600BD4969 /* MusadoraKit */ = {
 			isa = XCSwiftPackageProductDependency;

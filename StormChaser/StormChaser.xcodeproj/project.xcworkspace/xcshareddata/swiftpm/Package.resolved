@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "ID3TagEditor",
+        "repositoryURL": "https://github.com/chicio/ID3TagEditor.git",
+        "state": {
+          "branch": null,
+          "revision": "1f631c8d8f5f70d8ba00ea2c448fe6a1eb4529c2",
+          "version": "4.3.0"
+        }
+      },
+      {
         "package": "MusadoraKit",
         "repositoryURL": "https://github.com/rryam/MusadoraKit.git",
         "state": {
