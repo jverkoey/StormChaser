@@ -5,11 +5,66 @@
 //  Created by Jeff Verkoeyen on 9/12/22.
 //
 
+import Combine
+import SwiftUI
 import UIKit
 
 private enum CellTypes: String {
   case editableText
   case label
+}
+
+private final class InfoPaneDelegate: ObservableObject {
+  @Published var title: String = ""
+  @Published var path: String = ""
+}
+
+private struct InfoPane: View {
+  @ObservedObject var delegate: InfoPaneDelegate
+
+  var body: some View {
+    VStack {
+      Form {
+        Section(header: Text("Track information")) {
+          HStack {
+            Text("Title").foregroundColor(.gray)
+            TextField("Title", text: $delegate.title)
+          }
+        }
+      }
+
+      Divider()
+
+      Form {
+        Section(header: Text("Track location")) {
+          HStack(alignment: .top) {
+            if !FileManager.default.fileExists(atPath: delegate.path) {
+              Image(systemName: "questionmark.folder")
+            }
+            Text(delegate.path)
+              .contextMenu {
+                Button {
+                  let pasteBoard = UIPasteboard.general
+                  pasteBoard.string = delegate.path
+                } label: {
+                  Label("Copy", systemImage: "copy")
+                }
+                Button {
+                  guard let WorkspaceCompatibility = NSClassFromString("StormchaserBridge.WorkspaceCompatibility") as AnyObject as? NSObjectProtocol else {
+                    return
+                  }
+                  WorkspaceCompatibility.perform(NSSelectorFromString("showInFinder:"), with:[URL(string: delegate.path)])
+                } label: {
+                  Label("Show in Finder", systemImage: "copy")
+                }
+              }
+          }
+        }
+      }
+
+      Spacer()
+    }
+  }
 }
 
 final class InfoPaneViewController: UIViewController {
@@ -23,28 +78,26 @@ final class InfoPaneViewController: UIViewController {
     fatalError("init(coder:) has not been implemented")
   }
 
-  var tableView: UITableView!
+  private let delegate = InfoPaneDelegate()
+  private var cancellables: Set<AnyCancellable> = []
+  private var hostingController: UIHostingController<InfoPane>!
+  private var tableView: UITableView!
   override func viewDidLoad() {
     super.viewDidLoad()
 
     view.backgroundColor = .systemBackground
 
-    tableView = UITableView(frame: view.bounds, style: .insetGrouped)
-    tableView.translatesAutoresizingMaskIntoConstraints = false
-    tableView.dataSource = self
-    tableView.delegate = self
+    hostingController = UIHostingController(rootView: InfoPane(delegate: delegate))
+    addChild(hostingController)
 
-    tableView.register(UITableViewCell.self, forCellReuseIdentifier: CellTypes.editableText.rawValue)
-    tableView.register(UITableViewCell.self, forCellReuseIdentifier: CellTypes.label.rawValue)
+    hostingController.view.frame = view.bounds
+    hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    view.addSubview(hostingController.view)
+    hostingController.didMove(toParent: self)
 
-    view.addSubview(tableView)
-
-    NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-      tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-      tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-      tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-    ])
+//    cancellables.insert(delegate.$title.sink { title in
+//      print(title)
+//    })
   }
 
   var mediaItemId: Int64? {
@@ -60,73 +113,10 @@ final class InfoPaneViewController: UIViewController {
 
   var mediaItem: MediaItem? {
     didSet {
-      if isViewLoaded {
-        tableView.reloadData()
+      if let mediaItem = mediaItem {
+        delegate.title = mediaItem.title
+        delegate.path = mediaItem.url!.path
       }
     }
-  }
-}
-
-extension InfoPaneViewController: UITableViewDataSource {
-  func numberOfSections(in tableView: UITableView) -> Int {
-    return 2
-  }
-
-  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 1
-  }
-
-  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-
-    switch indexPath.section {
-    case 0:
-      let cell = tableView.dequeueReusableCell(withIdentifier: CellTypes.editableText.rawValue, for: indexPath)
-      var config = cell.textFieldConfiguration()
-      config.text = mediaItem?.title
-      cell.contentConfiguration = config
-      return cell
-
-    case 1:
-      let cell = tableView.dequeueReusableCell(withIdentifier: CellTypes.editableText.rawValue, for: indexPath)
-      var config = cell.defaultContentConfiguration()
-      config.text = mediaItem?.url?.path
-      cell.contentConfiguration = config
-      return cell
-
-    default:
-      break
-    }
-
-    return UITableViewCell(frame: .zero)
-  }
-
-  func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    switch section {
-    case 0:
-      return "Title"
-    case 1:
-      return "Location"
-    default:
-      return nil
-    }
-  }
-}
-
-extension InfoPaneViewController: UITableViewDelegate {
-  func tableView(_ tableView: UITableView, shouldHighlightRowAt indexPath: IndexPath) -> Bool {
-    return false
-  }
-
-  func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-    let actionProvider: UIContextMenuActionProvider = { _ in
-      return UIMenu(title: "", children: [
-        UIAction(title: "Copy") { _ in
-          let pasteBoard = UIPasteboard.general
-          pasteBoard.string = self.mediaItem?.url?.path
-        }
-      ])
-    }
-
-    return UIContextMenuConfiguration(identifier: "unique-ID" as NSCopying, previewProvider: nil, actionProvider: actionProvider)
   }
 }
