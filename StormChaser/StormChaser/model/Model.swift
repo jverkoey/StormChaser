@@ -14,6 +14,7 @@ final class Model {
   var playlists: [Playlist] = []
   private var playlistMap: [Int64: Playlist] = [:]
   private var mediaItemMap: [Int64: MediaItem] = [:]
+  private var tagMap: [Int64: Tag]?
 
   var canAccessAppleMusic: Bool? = nil
 
@@ -27,6 +28,46 @@ final class Model {
         db = nil
         playlists = []
       }
+    }
+  }
+
+  func allTags() -> [Tag] {
+    guard let db = db else {
+      return []
+    }
+
+    if let tagMap = tagMap {
+      return Array(tagMap.values)
+    }
+
+    let tagMap = try! db.prepare(
+      TagsTable.table
+        .select(
+          TagsTable.id,
+          TagsTable.name
+        )
+    ).reduce(into: [:], { partialResult, row in
+      partialResult[row[TagsTable.id]] = Tag(id: row[TagsTable.id], name: row[TagsTable.name])
+    })
+    self.tagMap = tagMap
+
+    return Array(tagMap.values)
+  }
+
+  func tags(for mediaItemId: Int64) -> [Tag] {
+    guard let db = db else {
+      return []
+    }
+
+    return try! db.prepare(
+      MediaItemTagsTable.table
+        .select(
+          MediaItemTagsTable.tagId,
+          TagsTable.name
+        ).join(TagsTable.table, on: TagsTable.id == MediaItemTagsTable.tagId)
+        .where( MediaItemTagsTable.mediaItemId == mediaItemId )
+    ).map { row in
+      Tag(id: row[MediaItemTagsTable.tagId], name: row[TagsTable.name])
     }
   }
 

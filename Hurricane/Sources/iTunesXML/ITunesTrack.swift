@@ -1,11 +1,12 @@
 import Foundation
 
 public struct ITunesTrack {
-  public init(trackID: Int, name: String, artist: String? = nil, composer: String? = nil, kind: String, size: Int? = nil, totalTime: Int? = nil, discNumber: Int? = nil, trackNumber: Int? = nil, year: Int? = nil, bpm: Int? = nil, dateModified: Date? = nil, dateAdded: Date, bitRate: Int? = nil, sampleRate: Int? = nil, comments: String? = nil, albumRating: Int? = nil, albumRatingComputed: Bool? = nil, normalization: Int? = nil, persistentID: String, trackType: String, location: String, fileFolderCount: Int? = nil, libraryFolderCount: Int? = nil, rating: Int, ratingComputed: Bool) {
+  public init(trackID: Int, name: String, artist: String? = nil, composer: String? = nil, grouping: String? = nil, kind: String, size: Int? = nil, totalTime: Int? = nil, discNumber: Int? = nil, trackNumber: Int? = nil, year: Int? = nil, bpm: Int? = nil, dateModified: Date? = nil, dateAdded: Date, bitRate: Int? = nil, sampleRate: Int? = nil, comments: String? = nil, albumRating: Int? = nil, albumRatingComputed: Bool? = nil, normalization: Int? = nil, persistentID: String, trackType: String, location: String, fileFolderCount: Int? = nil, libraryFolderCount: Int? = nil, rating: Int, ratingComputed: Bool) {
     self.trackID = trackID
     self.name = name
     self.artist = artist
     self.composer = composer
+    self.grouping = grouping
     self.kind = kind
     self.size = size
     self.totalTime = totalTime
@@ -29,11 +30,12 @@ public struct ITunesTrack {
     self.rating = rating
     self.ratingComputed = ratingComputed
   }
-
+  
   public let trackID: Int
   public let name: String
   public let artist: String?
   public let composer: String?
+  public let grouping: String?
   public let kind: String
   public let size: Int?
   public let totalTime: Int?

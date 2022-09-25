@@ -55,9 +55,39 @@ private let db = try Connection("/Users/featherless/Documents/chocobo.hurricane/
 //    try fm.moveItem(atPath: url.path, toPath: dropboxPath)
 //  }
 //}
+//
+//let library = try buildInMemoryRepresentation(db: db)
+//try writeDatabaseToITunesXML(library: library, path: "/Users/featherless/Documents/Library.xml") { track in
+//  return !track.ratingComputed && track.rating >= 60
+//}
 
-let library = try buildInMemoryRepresentation(db: db)
-try writeDatabaseToITunesXML(library: library, path: "/Users/featherless/Documents/Library.xml") { track in
-  return !track.ratingComputed && track.rating >= 60
-}
+// Populate all tags
+//var seenTags = Set<String>()
+//for item in try db.prepare(MediaItemTable.table.select(MediaItemTable.id, MediaItemTable.grouping)
+//) {
+//  if let grouping = item[MediaItemTable.grouping] {
+//    let tags = grouping.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+//    for tag in tags {
+//      if seenTags.contains(tag) {
+//        continue
+//      }
+//      seenTags.insert(tag)
+//      try TagsTable.upsert(db: db, name: tag)
+//    }
+//  }
+//}
 
+// Populate all media item tag relationships
+//try MediaItemTagsTable.createTable(db: db)
+//for item in try db.prepare(MediaItemTable.table.select(MediaItemTable.id, MediaItemTable.grouping)
+//) {
+//  if let grouping = item[MediaItemTable.grouping] {
+//    let tags = grouping.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces).lowercased() }
+//    for tag in tags {
+//      guard let tagId = try TagsTable.get(db: db, name: tag) else {
+//        fatalError("Missing tag")
+//      }
+//      try MediaItemTagsTable.connect(db: db, mediaItemId: item[MediaItemTable.id], tagId: tagId)
+//    }
+//  }
+//}

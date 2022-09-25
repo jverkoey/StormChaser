@@ -17,20 +17,21 @@ private enum CellTypes: String {
 private final class InfoPaneDelegate: ObservableObject {
   @Published var title: String = ""
   @Published var path: String = ""
-  @Published var tags: [String] = []
+  @Published var allTags: [Tag] = []
+  @Published var tags: [Tag] = []
 }
 
 struct MultiSelectPickerView: View {
   //the list of all items to read from
-  @State var sourceItems: [String]
+  @State var sourceItems: [Tag]
 
   //a binding to the values we want to track
-  @Binding var selectedItems: [String]
+  @Binding var selectedItems: [Tag]
 
   var body: some View {
     Form {
       List {
-        ForEach(sourceItems.sorted(), id: \.self) { item in
+        ForEach(sourceItems.sorted(by: { $0.name < $1.name }), id: \.self) { item in
           Button(action: {
             withAnimation {
               // At runtime, the following lines generate purple warnings. These appear to be a bug
@@ -46,7 +47,7 @@ struct MultiSelectPickerView: View {
             HStack {
               Image(systemName: "checkmark")
                 .opacity(self.selectedItems.contains(item) ? 1.0 : 0.0)
-              Text("\(item)")
+              Text("\(item.name)")
             }
           }
           .foregroundColor(.primary)
@@ -70,12 +71,12 @@ private struct InfoPane: View {
           }
 
           NavigationLink {
-            MultiSelectPickerView(sourceItems: delegate.tags, selectedItems: $delegate.tags)
+            MultiSelectPickerView(sourceItems: delegate.allTags, selectedItems: $delegate.tags)
               .navigationTitle("Edit tags")
           } label: {
             HStack {
               Text("Tags").foregroundColor(.gray)
-              Text(delegate.tags.joined(separator: ", "))
+              Text(delegate.tags.map { $0.name }.joined(separator: ", "))
             }
           }
         }
@@ -163,13 +164,13 @@ final class InfoPaneViewController: UIViewController {
   var mediaItem: MediaItem? {
     didSet {
       if let mediaItem = mediaItem {
+        let allTags = model.allTags()
+        let tags = model.tags(for: mediaItem.id)
+
         delegate.title = mediaItem.title
         delegate.path = mediaItem.url!.path
-        if let grouping = mediaItem.grouping {
-          delegate.tags = grouping.components(separatedBy: ",")
-        } else {
-          delegate.tags = []
-        }
+        delegate.allTags = allTags
+        delegate.tags = tags
       }
     }
   }
