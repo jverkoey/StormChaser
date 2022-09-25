@@ -28,9 +28,11 @@ struct MultiSelectPickerView: View {
   //a binding to the values we want to track
   @Binding var selectedItems: [Tag]
 
+  @State private var searchText = ""
+
   var body: some View {
     Form {
-      ForEach(sourceItems.sorted(by: { $0.name < $1.name }), id: \.id) { item in
+      ForEach(searchResults.sorted(by: { $0.name < $1.name }), id: \.id) { item in
         Button(action: {
           withAnimation {
             // At runtime, the following lines generate purple warnings. These appear to be a bug
@@ -52,7 +54,16 @@ struct MultiSelectPickerView: View {
         .foregroundColor(.primary)
       }
     }
+    .searchable(text: $searchText)
     .listStyle(GroupedListStyle())
+  }
+
+  var searchResults: [Tag] {
+    if searchText.isEmpty {
+      return sourceItems
+    } else {
+      return sourceItems.filter { $0.name.contains(searchText) }
+    }
   }
 }
 
@@ -70,7 +81,7 @@ private struct InfoPane: View {
 
           NavigationLink {
             MultiSelectPickerView(sourceItems: delegate.allTags, selectedItems: $delegate.tags)
-              .navigationTitle("Edit tags")
+              .navigationTitle("Tags")
           } label: {
             HStack {
               Text("Tags").foregroundColor(.gray)
