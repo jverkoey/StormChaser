@@ -16,6 +16,8 @@ final class Model {
   private var mediaItemMap: [Int64: MediaItem] = [:]
   private var tagMap: [Int64: Tag]?
 
+  private var prefs: Preferences?
+
   var canAccessAppleMusic: Bool? = nil
 
   var url: URL? {
@@ -24,9 +26,25 @@ final class Model {
         let db = try! Connection(url.appendingPathComponent("hurricane.sqlite3").path)
         self.db = db
         (playlists, playlistMap) = Model.buildPlaylists(db: db)
+
+        let prefsUrl = url.appendingPathComponent("preferences.plist")
+        let decoder = PropertyListDecoder()
+        if let prefsData = try? Data(contentsOf: prefsUrl),
+           let prefs = try? decoder.decode(Preferences.self, from: prefsData) {
+          self.prefs = prefs
+        } else {
+          let prefs = Preferences(tagExportMode: .none)
+          let encoder = PropertyListEncoder()
+          if let data = try? encoder.encode(prefs) {
+            try! data.write(to: prefsUrl)
+          }
+          self.prefs = prefs
+        }
+
       } else {
         db = nil
         playlists = []
+        prefs = nil
       }
     }
   }

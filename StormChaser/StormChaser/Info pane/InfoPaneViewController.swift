@@ -9,12 +9,6 @@ import Combine
 import SwiftUI
 import UIKit
 
-enum TagExportMode: String, CaseIterable, Identifiable {
-  case none
-  case grouping
-  var id: Self { self }
-}
-
 private final class InfoPaneDelegate: ObservableObject {
   @Published var title: String = ""
   @Published var grouping: String = ""
@@ -41,7 +35,7 @@ private struct InfoPane: View {
           }
         }
 
-        Section(header: Text("Tagging")) {
+        Section(header: Text("Organization")) {
           NavigationLink {
             MultiSelectPickerView(sourceItems: delegate.allTags, selectedItems: $delegate.tags)
               .navigationTitle("Tags")
@@ -52,14 +46,14 @@ private struct InfoPane: View {
             }
           }
 
-          HStack {
-            Text("Export").foregroundColor(.gray)
-            Picker("Tag export mode", selection: $delegate.tagExportMode) {
-              Text("None").tag(TagExportMode.none)
-              Text("Grouping").tag(TagExportMode.grouping)
-            }
-            .pickerStyle(.segmented)
-          }
+//          HStack {
+//            Text("Export").foregroundColor(.gray)
+//            Picker("Tag export mode", selection: $delegate.tagExportMode) {
+//              Text("None").tag(TagExportMode.none)
+//              Text("Grouping").tag(TagExportMode.grouping)
+//            }
+//            .pickerStyle(.segmented)
+//          }
         }
       }
 
