@@ -30,28 +30,26 @@ struct MultiSelectPickerView: View {
 
   var body: some View {
     Form {
-      List {
-        ForEach(sourceItems.sorted(by: { $0.name < $1.name }), id: \.self) { item in
-          Button(action: {
-            withAnimation {
-              // At runtime, the following lines generate purple warnings. These appear to be a bug
-              // in SwiftUI, as documented at https://www.donnywals.com/xcode-14-publishing-changes-from-within-view-updates-is-not-allowed-this-will-cause-undefined-behavior/
-              // The warning: "Publishing changes from within view updates is not allowed, this will cause undefined behavior."
-              if selectedItems.contains(item) {
-                selectedItems.removeAll(where: { $0 == item })
-              } else {
-                selectedItems.append(item)
-              }
-            }
-          }) {
-            HStack {
-              Image(systemName: "checkmark")
-                .opacity(self.selectedItems.contains(item) ? 1.0 : 0.0)
-              Text("\(item.name)")
+      ForEach(sourceItems.sorted(by: { $0.name < $1.name }), id: \.id) { item in
+        Button(action: {
+          withAnimation {
+            // At runtime, the following lines generate purple warnings. These appear to be a bug
+            // in SwiftUI, as documented at https://www.donnywals.com/xcode-14-publishing-changes-from-within-view-updates-is-not-allowed-this-will-cause-undefined-behavior/
+            // The warning: "Publishing changes from within view updates is not allowed, this will cause undefined behavior."
+            if selectedItems.contains(item) {
+              selectedItems.removeAll(where: { $0 == item })
+            } else {
+              selectedItems.append(item)
             }
           }
-          .foregroundColor(.primary)
+        }) {
+          HStack {
+            Image(systemName: "checkmark")
+              .opacity(self.selectedItems.contains(item) ? 1.0 : 0.0)
+            Text("\(item.name)")
+          }
         }
+        .foregroundColor(.primary)
       }
     }
     .listStyle(GroupedListStyle())
