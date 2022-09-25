@@ -17,6 +17,44 @@ private enum CellTypes: String {
 private final class InfoPaneDelegate: ObservableObject {
   @Published var title: String = ""
   @Published var path: String = ""
+  @Published var tags: [String] = []
+}
+
+struct MultiSelectPickerView: View {
+  //the list of all items to read from
+  @State var sourceItems: [String]
+
+  //a binding to the values we want to track
+  @Binding var selectedItems: [String]
+
+  var body: some View {
+    Form {
+      List {
+        ForEach(sourceItems.sorted(), id: \.self) { item in
+          Button(action: {
+            withAnimation {
+              // At runtime, the following lines generate purple warnings. These appear to be a bug
+              // in SwiftUI, as documented at https://www.donnywals.com/xcode-14-publishing-changes-from-within-view-updates-is-not-allowed-this-will-cause-undefined-behavior/
+              // The warning: "Publishing changes from within view updates is not allowed, this will cause undefined behavior."
+              if selectedItems.contains(item) {
+                selectedItems.removeAll(where: { $0 == item })
+              } else {
+                selectedItems.append(item)
+              }
+            }
+          }) {
+            HStack {
+              Image(systemName: "checkmark")
+                .opacity(self.selectedItems.contains(item) ? 1.0 : 0.0)
+              Text("\(item)")
+            }
+          }
+          .foregroundColor(.primary)
+        }
+      }
+    }
+    .listStyle(GroupedListStyle())
+  }
 }
 
 private struct InfoPane: View {
@@ -29,6 +67,16 @@ private struct InfoPane: View {
           HStack {
             Text("Title").foregroundColor(.gray)
             TextField("Title", text: $delegate.title)
+          }
+
+          NavigationLink {
+            MultiSelectPickerView(sourceItems: delegate.tags, selectedItems: $delegate.tags)
+              .navigationTitle("Edit tags")
+          } label: {
+            HStack {
+              Text("Tags").foregroundColor(.gray)
+              Text(delegate.tags.joined(separator: ", "))
+            }
           }
         }
       }
@@ -53,7 +101,7 @@ private struct InfoPane: View {
                   guard let WorkspaceCompatibility = NSClassFromString("StormchaserBridge.WorkspaceCompatibility") as AnyObject as? NSObjectProtocol else {
                     return
                   }
-                  WorkspaceCompatibility.perform(NSSelectorFromString("showInFinder:"), with:[URL(string: delegate.path)])
+                  WorkspaceCompatibility.perform(NSSelectorFromString("showInFinder:"), with:[URL(filePath: delegate.path)])
                 } label: {
                   Label("Show in Finder", systemImage: "copy")
                 }
@@ -88,12 +136,13 @@ final class InfoPaneViewController: UIViewController {
     view.backgroundColor = .systemBackground
 
     hostingController = UIHostingController(rootView: InfoPane(delegate: delegate))
-    addChild(hostingController)
+    let navigationController = UINavigationController(rootViewController: hostingController)
+    addChild(navigationController)
 
-    hostingController.view.frame = view.bounds
-    hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    view.addSubview(hostingController.view)
-    hostingController.didMove(toParent: self)
+    navigationController.view.frame = view.bounds
+    navigationController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    view.addSubview(navigationController.view)
+    navigationController.didMove(toParent: self)
 
 //    cancellables.insert(delegate.$title.sink { title in
 //      print(title)
@@ -116,6 +165,11 @@ final class InfoPaneViewController: UIViewController {
       if let mediaItem = mediaItem {
         delegate.title = mediaItem.title
         delegate.path = mediaItem.url!.path
+        if let grouping = mediaItem.grouping {
+          delegate.tags = grouping.components(separatedBy: ",")
+        } else {
+          delegate.tags = []
+        }
       }
     }
   }
