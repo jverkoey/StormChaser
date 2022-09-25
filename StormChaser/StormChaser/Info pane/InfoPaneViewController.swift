@@ -9,76 +9,39 @@ import Combine
 import SwiftUI
 import UIKit
 
-private enum CellTypes: String {
-  case editableText
-  case label
+enum TagExportMode: String, CaseIterable, Identifiable {
+  case none
+  case grouping
+  var id: Self { self }
 }
 
 private final class InfoPaneDelegate: ObservableObject {
   @Published var title: String = ""
+  @Published var grouping: String = ""
   @Published var path: String = ""
   @Published var allTags: [Tag] = []
   @Published var tags: [Tag] = []
-}
-
-struct MultiSelectPickerView: View {
-  //the list of all items to read from
-  @State var sourceItems: [Tag]
-
-  //a binding to the values we want to track
-  @Binding var selectedItems: [Tag]
-
-  @State private var searchText = ""
-
-  var body: some View {
-    Form {
-      ForEach(searchResults.sorted(by: { $0.name < $1.name }), id: \.id) { item in
-        Button(action: {
-          withAnimation {
-            // At runtime, the following lines generate purple warnings. These appear to be a bug
-            // in SwiftUI, as documented at https://www.donnywals.com/xcode-14-publishing-changes-from-within-view-updates-is-not-allowed-this-will-cause-undefined-behavior/
-            // The warning: "Publishing changes from within view updates is not allowed, this will cause undefined behavior."
-            if selectedItems.contains(item) {
-              selectedItems.removeAll(where: { $0 == item })
-            } else {
-              selectedItems.append(item)
-            }
-          }
-        }) {
-          HStack {
-            Image(systemName: "checkmark")
-              .opacity(self.selectedItems.contains(item) ? 1.0 : 0.0)
-            Text("\(item.name)")
-          }
-        }
-        .foregroundColor(.primary)
-      }
-    }
-    .searchable(text: $searchText)
-    .listStyle(GroupedListStyle())
-  }
-
-  var searchResults: [Tag] {
-    if searchText.isEmpty {
-      return sourceItems
-    } else {
-      return sourceItems.filter { $0.name.contains(searchText) }
-    }
-  }
+  @Published var tagExportMode: TagExportMode = .none
 }
 
 private struct InfoPane: View {
   @ObservedObject var delegate: InfoPaneDelegate
 
   var body: some View {
-    VStack {
+    VStack(spacing: 0) {
       Form {
         Section(header: Text("Track information")) {
           HStack {
             Text("Title").foregroundColor(.gray)
             TextField("Title", text: $delegate.title)
           }
+          HStack {
+            Text("Grouping").foregroundColor(.gray)
+            TextField("Grouping", text: $delegate.grouping)
+          }
+        }
 
+        Section(header: Text("Tagging")) {
           NavigationLink {
             MultiSelectPickerView(sourceItems: delegate.allTags, selectedItems: $delegate.tags)
               .navigationTitle("Tags")
@@ -87,6 +50,15 @@ private struct InfoPane: View {
               Text("Tags").foregroundColor(.gray)
               Text(delegate.tags.map { $0.name }.joined(separator: ", "))
             }
+          }
+
+          HStack {
+            Text("Export").foregroundColor(.gray)
+            Picker("Tag export mode", selection: $delegate.tagExportMode) {
+              Text("None").tag(TagExportMode.none)
+              Text("Grouping").tag(TagExportMode.grouping)
+            }
+            .pickerStyle(.segmented)
           }
         }
       }
@@ -177,6 +149,7 @@ final class InfoPaneViewController: UIViewController {
         let tags = model.tags(for: mediaItem.id)
 
         delegate.title = mediaItem.title
+        delegate.grouping = mediaItem.grouping ?? ""
         delegate.path = mediaItem.url!.path
         delegate.allTags = allTags
         delegate.tags = tags

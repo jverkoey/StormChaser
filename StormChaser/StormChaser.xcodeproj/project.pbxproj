@@ -24,6 +24,7 @@
 		66714E6F28DD7BE4005345A3 /* ID3TagEditor in Frameworks */ = {isa = PBXBuildFile; productRef = 66714E6E28DD7BE4005345A3 /* ID3TagEditor */; };
 		66714E7128DECFD2005345A3 /* WorkspaceCompatibility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E7028DECFD2005345A3 /* WorkspaceCompatibility.swift */; };
 		66714E7528E00E0E005345A3 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E7428E00E0E005345A3 /* Tag.swift */; };
+		66714E7728E0209F005345A3 /* MultiSelectPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E7628E0209F005345A3 /* MultiSelectPickerView.swift */; };
 		6687136228DAD16600BD4969 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6687136128DAD16600BD4969 /* MusadoraKit */; };
 		668DD78828CEA652004DFA8D /* StormchaserBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 668DD78728CEA652004DFA8D /* StormchaserBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668DD79528CEA691004DFA8D /* StormchaserBridge.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 668DD78528CEA652004DFA8D /* StormchaserBridge.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -76,6 +77,7 @@
 		66714E6B28DAE841005345A3 /* TextFieldContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldContentView.swift; sourceTree = "<group>"; };
 		66714E7028DECFD2005345A3 /* WorkspaceCompatibility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceCompatibility.swift; sourceTree = "<group>"; };
 		66714E7428E00E0E005345A3 /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		66714E7628E0209F005345A3 /* MultiSelectPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSelectPickerView.swift; sourceTree = "<group>"; };
 		668DD78528CEA652004DFA8D /* StormchaserBridge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StormchaserBridge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		668DD78728CEA652004DFA8D /* StormchaserBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StormchaserBridge.h; sourceTree = "<group>"; };
 		668DD79628CEA6BC004DFA8D /* PlayerFieldItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerFieldItem.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 			isa = PBXGroup;
 			children = (
 				665BA14828D04CC30094BA27 /* InfoPaneViewController.swift */,
+				66714E7628E0209F005345A3 /* MultiSelectPickerView.swift */,
 			);
 			path = "Info pane";
 			sourceTree = "<group>";
@@ -343,6 +346,7 @@
 				6643737928CD7BEA0008AE36 /* Model.swift in Sources */,
 				66714E6C28DAE841005345A3 /* TextFieldContentView.swift in Sources */,
 				6643736428CD4CF70008AE36 /* PlaylistViewController.swift in Sources */,
+				66714E7728E0209F005345A3 /* MultiSelectPickerView.swift in Sources */,
 				6643736028CD4CF70008AE36 /* AppDelegate.swift in Sources */,
 				6643736228CD4CF70008AE36 /* SceneDelegate.swift in Sources */,
 				668DD79928CEC1FD004DFA8D /* AppDelegate+menu.swift in Sources */,
