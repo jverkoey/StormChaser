@@ -93,7 +93,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     let window = UIWindow(windowScene: windowScene)
-    let splitViewController = UISplitViewController(style: .doubleColumn)
+    let splitViewController = SplitViewController(style: .doubleColumn, model: model)
     splitViewController.primaryBackgroundStyle = .sidebar
     splitViewController.preferredDisplayMode = .oneBesideSecondary
     splitViewController.preferredSplitBehavior = .tile
@@ -149,26 +149,34 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 extension NSToolbarItem.Identifier {
   static let play = NSToolbarItem.Identifier(rawValue: "com.hurricane.play")
   static let player = NSToolbarItem.Identifier(rawValue: "com.hurricane.player")
+  static let settings = NSToolbarItem.Identifier(rawValue: "com.hurricane.settings")
 }
 
 extension SceneDelegate: NSToolbarDelegate {
   func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
-    if itemIdentifier == NSToolbarItem.Identifier.player {
+    switch itemIdentifier {
+    case .player:
       return playerFieldItem
-    }
-    if itemIdentifier == playPauseItem.itemIdentifier {
+    case .play:
       playPauseItem.image = UIImage(systemName: "play.fill")
       playPauseItem.action = NSSelectorFromString("togglePlaybackOfSelectedItem:")
       return playPauseItem
+    case .settings:
+      let item = NSToolbarItem(itemIdentifier: itemIdentifier)
+      item.image = UIImage(systemName: "gear")
+      item.action = #selector(SplitViewController.openSettings(_:))
+      return item
+    default:
+      fatalError()
     }
-    return nil
   }
 
   func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
     return [
       NSToolbarItem.Identifier.play,
       NSToolbarItem.Identifier.flexibleSpace,
-      NSToolbarItem.Identifier.player
+      NSToolbarItem.Identifier.player,
+      NSToolbarItem.Identifier.settings
     ]
   }
 
@@ -177,7 +185,8 @@ extension SceneDelegate: NSToolbarDelegate {
       NSToolbarItem.Identifier.play,
       NSToolbarItem.Identifier.flexibleSpace,
       NSToolbarItem.Identifier.player,
-      NSToolbarItem.Identifier.flexibleSpace
+      NSToolbarItem.Identifier.flexibleSpace,
+      NSToolbarItem.Identifier.settings
     ]
   }
 }

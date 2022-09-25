@@ -16,9 +16,20 @@ final class Model {
   private var mediaItemMap: [Int64: MediaItem] = [:]
   private var tagMap: [Int64: Tag]?
 
-  private var prefs: Preferences?
+  var prefs: Preferences?
 
   var canAccessAppleMusic: Bool? = nil
+
+  func savePreferences() {
+    guard let url else {
+      return
+    }
+    let prefsUrl = url.appendingPathComponent("preferences.plist")
+    let encoder = PropertyListEncoder()
+    if let data = try? encoder.encode(prefs) {
+      try! data.write(to: prefsUrl)
+    }
+  }
 
   var url: URL? {
     didSet {

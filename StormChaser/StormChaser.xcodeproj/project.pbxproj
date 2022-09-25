@@ -26,6 +26,8 @@
 		66714E7528E00E0E005345A3 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E7428E00E0E005345A3 /* Tag.swift */; };
 		66714E7728E0209F005345A3 /* MultiSelectPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E7628E0209F005345A3 /* MultiSelectPickerView.swift */; };
 		66714E7928E02401005345A3 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E7828E02401005345A3 /* Preferences.swift */; };
+		66714E7B28E02824005345A3 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E7A28E02824005345A3 /* SplitViewController.swift */; };
+		66714E7D28E0285B005345A3 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66714E7C28E0285B005345A3 /* SettingsViewController.swift */; };
 		6687136228DAD16600BD4969 /* MusadoraKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6687136128DAD16600BD4969 /* MusadoraKit */; };
 		668DD78828CEA652004DFA8D /* StormchaserBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 668DD78728CEA652004DFA8D /* StormchaserBridge.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		668DD79528CEA691004DFA8D /* StormchaserBridge.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 668DD78528CEA652004DFA8D /* StormchaserBridge.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -80,6 +82,8 @@
 		66714E7428E00E0E005345A3 /* Tag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		66714E7628E0209F005345A3 /* MultiSelectPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSelectPickerView.swift; sourceTree = "<group>"; };
 		66714E7828E02401005345A3 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		66714E7A28E02824005345A3 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
+		66714E7C28E0285B005345A3 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		668DD78528CEA652004DFA8D /* StormchaserBridge.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StormchaserBridge.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		668DD78728CEA652004DFA8D /* StormchaserBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StormchaserBridge.h; sourceTree = "<group>"; };
 		668DD79628CEA6BC004DFA8D /* PlayerFieldItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerFieldItem.swift; sourceTree = "<group>"; };
@@ -155,6 +159,8 @@
 				6643735F28CD4CF70008AE36 /* AppDelegate.swift */,
 				66714E7828E02401005345A3 /* Preferences.swift */,
 				6643736128CD4CF70008AE36 /* SceneDelegate.swift */,
+				66714E7A28E02824005345A3 /* SplitViewController.swift */,
+				66714E7C28E0285B005345A3 /* SettingsViewController.swift */,
 				6643737C28CDA91D0008AE36 /* model */,
 				66714E7328DF6A09005345A3 /* Sidebar */,
 				665BA14A28D053BC0094BA27 /* Playlist */,
@@ -355,9 +361,11 @@
 				6643736228CD4CF70008AE36 /* SceneDelegate.swift in Sources */,
 				668DD79928CEC1FD004DFA8D /* AppDelegate+menu.swift in Sources */,
 				6643737228CD75EA0008AE36 /* SidebarViewController.swift in Sources */,
+				66714E7D28E0285B005345A3 /* SettingsViewController.swift in Sources */,
 				66714E6A28DADC6B005345A3 /* SplitterView.swift in Sources */,
 				6643737E28CDA92B0008AE36 /* Playlist.swift in Sources */,
 				66714E7528E00E0E005345A3 /* Tag.swift in Sources */,
+				66714E7B28E02824005345A3 /* SplitViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

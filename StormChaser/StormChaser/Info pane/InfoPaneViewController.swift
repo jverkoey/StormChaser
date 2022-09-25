@@ -15,14 +15,13 @@ private final class InfoPaneDelegate: ObservableObject {
   @Published var path: String = ""
   @Published var allTags: [Tag] = []
   @Published var tags: [Tag] = []
-  @Published var tagExportMode: TagExportMode = .none
 }
 
 private struct InfoPane: View {
   @ObservedObject var delegate: InfoPaneDelegate
 
   var body: some View {
-    VStack(spacing: 0) {
+    VStack {
       Form {
         Section(header: Text("Track information")) {
           HStack {
@@ -45,15 +44,6 @@ private struct InfoPane: View {
               Text(delegate.tags.map { $0.name }.joined(separator: ", "))
             }
           }
-
-//          HStack {
-//            Text("Export").foregroundColor(.gray)
-//            Picker("Tag export mode", selection: $delegate.tagExportMode) {
-//              Text("None").tag(TagExportMode.none)
-//              Text("Grouping").tag(TagExportMode.grouping)
-//            }
-//            .pickerStyle(.segmented)
-//          }
         }
       }
 
@@ -119,10 +109,6 @@ final class InfoPaneViewController: UIViewController {
     navigationController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     view.addSubview(navigationController.view)
     navigationController.didMove(toParent: self)
-
-//    cancellables.insert(delegate.$title.sink { title in
-//      print(title)
-//    })
   }
 
   var mediaItemId: Int64? {
