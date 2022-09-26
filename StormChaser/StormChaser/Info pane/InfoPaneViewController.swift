@@ -67,7 +67,7 @@ private struct InfoPane: View {
                   guard let WorkspaceCompatibility = NSClassFromString("StormchaserBridge.WorkspaceCompatibility") as AnyObject as? NSObjectProtocol else {
                     return
                   }
-                  WorkspaceCompatibility.perform(NSSelectorFromString("showInFinder:"), with:[URL(filePath: delegate.path)])
+                  WorkspaceCompatibility.perform(NSSelectorFromString("showInFinder:"), with:[URL(fileURLWithPath: delegate.path)])
                 } label: {
                   Label("Show in Finder", systemImage: "copy")
                 }
