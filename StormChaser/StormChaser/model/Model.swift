@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ID3TagEditor
 import HurricaneDB
 import SQLite
 
@@ -172,6 +173,28 @@ extension Model {
 
   func mediaItem(withId id: Int64) -> MediaItem? {
     return mediaItemMap[id]
+  }
+
+  func updateTrack(id: Int64, title: String) throws {
+    guard let db = db else {
+      return
+    }
+
+    try db.run(MediaItemTable.table.filter(MediaItemTable.id == id).update(
+      MediaItemTable.title <- title
+    ))
+
+    // TODO: Only do this automatically if configured to do so.
+//    guard let mediaItem = mediaItem(withId: id) else {
+//      return
+//    }
+//
+//    let editor = ID3TagEditor()
+//    if let loadedUrl = mediaItem.url,
+//       let id3tag = try? editor.read(from: loadedUrl.path) {
+//      id3tag.frames[.title] = ID3FrameWithStringContent(content: title)
+//      try editor.write(tag: id3tag, to: loadedUrl.path)
+//    }
   }
 
   func moveItem(id: Int64, fromIndex: Int, toIndex: Int, in playlist: Playlist) {

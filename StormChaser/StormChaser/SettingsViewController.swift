@@ -64,7 +64,7 @@ final class SettingsViewController: UIViewController {
       delegate.tagExportMode = prefs.tagExportMode
 
       cancellables.insert(delegate.$tagExportMode.sink { [weak self] tagExportMode in
-        guard let self else {
+        guard let self = self else {
           return
         }
         self.model.prefs?.tagExportMode = tagExportMode

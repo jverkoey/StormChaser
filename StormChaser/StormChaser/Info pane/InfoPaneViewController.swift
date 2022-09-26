@@ -140,6 +140,19 @@ final class InfoPaneViewController: UIViewController {
     navigationController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     view.addSubview(navigationController.view)
     navigationController.didMove(toParent: self)
+
+    cancellables.insert(delegate.$title
+      .debounce(for: .milliseconds(1000), scheduler: RunLoop.main)
+      .sink { [weak self] title in
+      guard let self = self,
+            let id = self.mediaItemId else {
+        return
+      }
+      guard self.mediaItem?.title != title else {
+        return
+      }
+      try! self.model.updateTrack(id: id, title: title)
+    })
   }
 
   var mediaItemId: Int64? {
