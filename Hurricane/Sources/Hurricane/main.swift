@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 import iTunesLibrary
 import iTunesXML
 import HurricaneDB
@@ -88,6 +89,25 @@ private let db = try Connection("/Users/featherless/Documents/chocobo.hurricane/
 //        fatalError("Missing tag")
 //      }
 //      try MediaItemTagsTable.connect(db: db, mediaItemId: item[MediaItemTable.id], tagId: tagId)
+//    }
+//  }
+//}
+
+// Populate all media item tag relationships
+//for item in try db.prepare(MediaItemTable.table
+//  .select(MediaItemTable.id, MediaItemTable.location)
+//  .filter(MediaItemTable.lastKnownFileHash == nil)
+//) {
+//  try autoreleasepool {
+//    if let location = item[MediaItemTable.location] {
+//      let locationUrl = URL(string: location)!
+//      if let data = try? Data(contentsOf: locationUrl) {
+//        let hash = Data(SHA512.hash(data: data))
+//
+//        try db.run(MediaItemTable.table.filter(MediaItemTable.id == item[MediaItemTable.id]).update(
+//          MediaItemTable.lastKnownFileHash <- hash
+//        ))
+//      }
 //    }
 //  }
 //}

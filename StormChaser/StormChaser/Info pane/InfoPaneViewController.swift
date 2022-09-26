@@ -6,6 +6,7 @@
 //
 
 import Combine
+import ID3TagEditor
 import SwiftUI
 import UIKit
 
@@ -15,6 +16,9 @@ private final class InfoPaneDelegate: ObservableObject {
   @Published var path: String = ""
   @Published var allTags: [Tag] = []
   @Published var tags: [Tag] = []
+
+  @Published var id3Title: String? = nil
+  @Published var id3Grouping: String? = nil
 }
 
 private struct InfoPane: View {
@@ -25,10 +29,22 @@ private struct InfoPane: View {
       Form {
         Section(header: Text("Track information")) {
           HStack {
+            if delegate.title == delegate.id3Title {
+              Image(systemName: "externaldrive.badge.checkmark").foregroundColor(.green)
+            } else {
+              // TODO: Make this a button that shows a menu for syncing the id3 data and the db
+              Image(systemName: "externaldrive.badge.exclamationmark").foregroundColor(.red)
+            }
             Text("Title").foregroundColor(.gray)
             TextField("Title", text: $delegate.title)
           }
           HStack {
+            if delegate.grouping == delegate.id3Grouping {
+              Image(systemName: "externaldrive.badge.checkmark").foregroundColor(.green)
+            } else {
+              // TODO: Make this a button that shows a menu for syncing the id3 data and the db
+              Image(systemName: "externaldrive.badge.exclamationmark").foregroundColor(.red)
+            }
             Text("Grouping").foregroundColor(.gray)
             TextField("Grouping", text: $delegate.grouping)
           }
@@ -50,7 +66,7 @@ private struct InfoPane: View {
       Divider()
 
       Form {
-        Section(header: Text("Track location")) {
+        Section(header: Text("File location")) {
           HStack(alignment: .top) {
             if !FileManager.default.fileExists(atPath: delegate.path) {
               Image(systemName: "questionmark.folder")
@@ -72,6 +88,21 @@ private struct InfoPane: View {
                   Label("Show in Finder", systemImage: "copy")
                 }
               }
+          }
+        }
+
+        Section(header: Text("id3 information")) {
+          if let value = delegate.id3Title {
+            HStack {
+              Text("Title").foregroundColor(.gray)
+              Text(value)
+            }
+          }
+          if let value = delegate.id3Grouping {
+            HStack {
+              Text("Grouping").foregroundColor(.gray)
+              Text(value)
+            }
           }
         }
       }
@@ -127,6 +158,17 @@ final class InfoPaneViewController: UIViewController {
       if let mediaItem = mediaItem {
         let allTags = model.allTags()
         let tags = model.tags(for: mediaItem.id)
+
+        let editor = ID3TagEditor()
+        if let loadedUrl = mediaItem.url,
+           let id3tag = try? editor.read(from: loadedUrl.path) {
+          let tagContentReader = ID3TagContentReader(id3Tag: id3tag)
+          delegate.id3Title = tagContentReader.title()
+          delegate.id3Grouping = (id3tag.frames[.iTunesGrouping] as? ID3FrameWithStringContent)?.content
+        } else {
+          delegate.id3Title = nil
+          delegate.id3Grouping = nil
+        }
 
         delegate.title = mediaItem.title
         delegate.grouping = mediaItem.grouping ?? ""

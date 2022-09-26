@@ -216,12 +216,6 @@ extension SceneDelegate: PlaylistViewControllerDelegate {
 
     loadedUrl = mediaItem.url
 
-//    if let loadedUrl = loadedUrl {
-//      let editor = ID3TagEditor()
-//      let id3tag = try! editor.read(from: loadedUrl.path)
-//      print(id3tag)
-//    }
-
     // Playing a new file
     audioPlayer.pause()
 
