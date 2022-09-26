@@ -21,7 +21,7 @@ final class Model {
   var canAccessAppleMusic: Bool? = nil
 
   func savePreferences() {
-    guard let url else {
+    guard let url = url else {
       return
     }
     let prefsUrl = url.appendingPathComponent("preferences.plist")
